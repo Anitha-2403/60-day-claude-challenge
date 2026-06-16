@@ -1,36 +1,30 @@
-# 60-day-claude-challenge
-
+# 🚀 60 Days of AI Challenge
 
 Hi, I'm Anitha.
 
-Welcome to my 60 Days of AI Challenge repository. This repository documents my journey of learning AI tools, improving my programming skills, and building practical projects over the next 60 days.
+Welcome to my 60 Days of AI Challenge repository. This repository documents my journey of learning AI, exploring modern AI tools, improving my software development skills, and building practical projects over the next 60 days.
 
-## Goals
+## 🎯 Goals
 
-* Learn AI tools effectively
+* Learn AI tools and workflows
 * Improve programming and problem-solving skills
 * Build practical AI-related projects
-* Share my progress publicly
+* Document my learning journey publicly
 * Develop a strong portfolio
+* Stay consistent for 60 days
 
-## Progress
+## 🛠️ Tools Used
 
-### Day 1 - Claude Setup & AI Personality Profile
+* Claude AI
+* GitHub
+* Markdown
+* AI Productivity Tools
+* Programming Languages (as learned during the challenge)
 
-Completed:
+## 🌱 Learning Philosophy
 
-* Installed and explored Claude
-* Created an AI Personality Profile
-* Generated a cinematic AI portrait
-* Created a public GitHub repository
+I believe the best way to learn AI is by building, experimenting, documenting, and sharing knowledge consistently.
 
-### Repository Structure
+## 📌 Connect With Me
 
-* README.md
-* Day-01/
-
-  * ai-profile.md
-  * portrait.png
-  * screenshot.png
-
-Stay tuned for daily updates as I continue my AI learning journey.
+This repository will be updated daily throughout my 60-day AI learning journey.
