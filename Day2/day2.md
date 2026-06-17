@@ -1,57 +1,30 @@
 # Day 2 - Prompt Engineering
 
-## Objective
+## What I Did
 
-Learn the difference between a simple prompt and an engineered prompt.
+Today I learned the difference between a simple prompt and an engineered prompt.
 
-## Lazy Prompt
-
-Prompt Used:
+### Lazy Prompt
 
 Create an image explaining Prompt Engineering.
 
-### Observation
+### Engineered Prompt
 
-The output was simple and contained limited details and structure.
+I used a detailed prompt with instructions, examples, design requirements, and output formatting.
 
-## Engineered Prompt
+## What I Learned
 
-Prompt Used:
-
-You are an AI educator teaching complete beginners.
-
-Explain Prompt Engineering in simple language.
-
-Include:
-
-* What Prompt Engineering is
-* Why it matters when using AI tools like Claude
-* One example of a weak prompt
-* One example of an improved prompt
-* Three practical benefits of writing better prompts
-
-Also create a LinkedIn-ready image concept.
-
-### Observation
-
-The output was more detailed, structured, and visually organized. It included explanations, examples, and a professional image concept.
-
-## Key Learnings
-
-* Better prompts produce better outputs.
-* Providing context improves AI responses.
-* Structured prompts help AI understand the task clearly.
-* Prompt Engineering is an important skill when working with AI tools.
+* Better prompts give better results.
+* More context helps AI understand the task.
+* Structured prompts create professional outputs.
+* Prompt Engineering is an important AI skill.
 
 ## Comparison
 
-| Feature        | Lazy Prompt | Engineered Prompt |
-| -------------- | ----------- | ----------------- |
-| Detail         | Low         | High              |
-| Structure      | Basic       | Professional      |
-| Examples       | Few         | Many              |
-| Learning Value | Average     | Excellent         |
+The lazy prompt produced a simple output.
+
+The engineered prompt produced a detailed, structured, and more useful output with better explanations and design ideas.
 
 ## Conclusion
 
-This exercise showed that detailed and structured prompts generate more useful, accurate, and professional AI responses.
+Prompt engineering helps improve the quality, accuracy, and usefulness of AI responses.
