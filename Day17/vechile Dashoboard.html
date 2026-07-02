@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>E85 Fuel Analytics Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0b0f18; --card:#171d2b; --card2:#1d2437; --text:#e8ecf5; --muted:#8b93a7;
+    --accent:#4fd1c5; --accent2:#f6ad55; --danger:#fc8181; --good:#68d391; --border:#2a3348;
+    --purple:#b794f6; --blue:#63b3ed;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:linear-gradient(180deg,#0b0f18,#0f1420);color:var(--text);font-family:'Segoe UI',Roboto,Arial,sans-serif;padding:24px;}
+
+  /* HEADER */
+  header{background:linear-gradient(135deg,#1d2437,#232b42);border:1px solid var(--border);border-radius:16px;padding:24px 28px;margin-bottom:22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+  header h1{margin:0 0 6px;font-size:26px;}
+  header .sub{color:var(--muted);font-size:13px;}
+  .vehicle-pills{display:flex;gap:10px;flex-wrap:wrap;}
+  .pill{background:#232b42;border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:12px;color:var(--muted);}
+  .pill b{color:var(--text);}
+
+  /* KPI CARDS */
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:24px;}
+  .kpi-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;position:relative;overflow:hidden;}
+  .kpi-card::before{content:"";position:absolute;top:0;left:0;width:4px;height:100%;background:var(--accent);}
+  .kpi-card.orange::before{background:var(--accent2);}
+  .kpi-card.purple::before{background:var(--purple);}
+  .kpi-card.blue::before{background:var(--blue);}
+  .kpi-label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+  .kpi-value{font-size:28px;font-weight:700;}
+  .kpi-note{color:var(--muted);font-size:11px;margin-top:6px;}
+  .kpi-value .unit{font-size:14px;color:var(--muted);font-weight:400;}
+
+  section{margin-bottom:26px;}
+  section h2{font-size:17px;border-left:4px solid var(--accent);padding-left:10px;margin-bottom:14px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;}
+  .two-col{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;}
+  .three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  @media(max-width:900px){.two-col,.three-col{grid-template-columns:1fr;}}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{padding:8px 6px;text-align:left;border-bottom:1px solid var(--border);}
+  th{color:var(--muted);font-weight:600;}
+  tr.highlight{background:rgba(79,209,197,0.12);}
+
+  /* FUEL CARDS */
+  .fuel-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;}
+  .fuel-card{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center;transition:transform .15s;}
+  .fuel-card:hover{transform:translateY(-3px);border-color:var(--accent);}
+  .fuel-card .icon{font-size:28px;margin-bottom:6px;}
+  .fuel-card .name{font-weight:700;font-size:14px;margin-bottom:8px;}
+  .fuel-card .stat{font-size:12px;color:var(--muted);margin:2px 0;}
+  .fuel-card .stat b{color:var(--text);}
+  .fuel-card.best{border-color:var(--good);box-shadow:0 0 0 1px var(--good) inset;}
+  .fuel-card.you{border-color:var(--accent2);box-shadow:0 0 0 1px var(--accent2) inset;}
+  .badge{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700;}
+  .badge.good{background:rgba(104,211,145,.15);color:var(--good);}
+  .badge.you-badge{background:rgba(246,173,85,.15);color:var(--accent2);}
+
+  /* GAUGE */
+  .gauge-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .gauge-value{font-size:32px;font-weight:700;margin-top:-40px;}
+  .gauge-label{color:var(--muted);font-size:12px;margin-top:4px;}
+
+  .paradox-box{background:linear-gradient(135deg,#2a2036,#231a2e);border:1px solid #4a3a5c;border-radius:14px;padding:20px;}
+  .paradox-box h3{color:var(--accent2);margin-top:0;}
+
+  footer{color:var(--muted);font-size:12px;text-align:center;margin-top:20px;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div>
+    <h1>⛽ E85 Fuel Analytics Dashboard</h1>
+    <div class="sub">Day 17 · Cost, Emissions & Break-even Analysis · 52 vehicle records · 5 fuel types</div>
+  </div>
+  <div class="vehicle-pills">
+    <div class="pill">Vehicle <b>Honda Activa 6G</b></div>
+    <div class="pill">Fuel <b>Petrol</b></div>
+    <div class="pill">Usage <b>City</b></div>
+    <div class="pill">Distance <b>1,000 km/mo</b></div>
+    <div class="pill">Age <b>3 yrs</b></div>
+  </div>
+</header>
+
+<!-- KPI CARDS -->
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-label">Cost / km (Petrol)</div>
+    <div class="kpi-value">₹6.15 <span class="unit">/km</span></div>
+    <div class="kpi-note">Avg across 11 Petrol (E20) records</div>
+  </div>
+  <div class="kpi-card orange">
+    <div class="kpi-label">Monthly Cost (1,000 km)</div>
+    <div class="kpi-value">₹6,154</div>
+    <div class="kpi-note">At current Petrol cost/km · Activa 6G</div>
+  </div>
+  <div class="kpi-card purple">
+    <div class="kpi-label">E85 Break-even Price</div>
+    <div class="kpi-value">₹79.2 <span class="unit">/L</span></div>
+    <div class="kpi-note">E85 would need to drop from ₹82/L to ₹79.2/L to match Petrol's cost/km</div>
+  </div>
+  <div class="kpi-card blue">
+    <div class="kpi-label">Cheapest Fuel Overall</div>
+    <div class="kpi-value">Electric</div>
+    <div class="kpi-note">₹1.75/km — 3.5× cheaper than Petrol</div>
+  </div>
+</div>
+
+<!-- FUEL COMPARISON CHARTS -->
+<section>
+  <h2>Fuel Comparison — Cost, CO₂ & Maintenance (SVG-rendered Charts)</h2>
+  <div class="two-col">
+    <div class="card"><canvas id="fuelBarChart" height="230"></canvas></div>
+    <div class="card">
+      <h3 style="margin-top:0;color:var(--muted);font-size:13px;text-transform:uppercase;">Summary Table</h3>
+      <table>
+        <tr><th>Fuel</th><th>₹/km</th><th>CO₂ kg/km</th><th>Maint ₹/km</th></tr>
+        <tr><td>Electric (EV)</td><td>1.75</td><td>0.091</td><td>0.233</td></tr>
+        <tr><td>CNG</td><td>3.32</td><td>0.125</td><td>0.662</td></tr>
+        <tr><td>Diesel</td><td>4.67</td><td>0.179</td><td>1.005</td></tr>
+        <tr class="highlight"><td>Petrol (E20)</td><td>6.15</td><td>0.171</td><td>0.466</td></tr>
+        <tr><td>E85 (Flex-Fuel)</td><td>6.37</td><td>0.070</td><td>0.460</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- DOUGHNUT + LINE + GAUGE -->
+<section>
+  <h2>Cost Share, Age Trend & Efficiency Gauge</h2>
+  <div class="three-col">
+    <div class="card">
+      <h3 style="margin-top:0;color:var(--muted);font-size:13px;text-transform:uppercase;">Cost Share by Fuel (Doughnut)</h3>
+      <canvas id="doughnutChart" height="220"></canvas>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0;color:var(--muted);font-size:13px;text-transform:uppercase;">₹/km by Vehicle Age (Line)</h3>
+      <canvas id="lineChart" height="220"></canvas>
+    </div>
+    <div class="card gauge-wrap">
+      <h3 style="margin-top:0;color:var(--muted);font-size:13px;text-transform:uppercase;">E85 Score Gauge</h3>
+      <canvas id="gaugeChart" height="180"></canvas>
+      <div class="gauge-value" id="gaugeValueText">53</div>
+      <div class="gauge-label">out of 100 · Mid-pack value</div>
+    </div>
+  </div>
+</section>
+
+<!-- E85 PARADOX -->
+<section>
+  <h2>The E85 Paradox</h2>
+  <div class="paradox-box">
+    <h3>⚠️ High Cost, Lowest Emissions</h3>
+    <p>E85 (Flex-Fuel) is the <b>most expensive fuel per km (₹6.37)</b> — pricier even than plain Petrol —
+    yet it produces the <b>lowest CO₂ per km (0.070 kg)</b> of every fuel type in the dataset.
+    Its maintenance cost (₹0.460/km) stays on par with Petrol, not worse.</p>
+    <p style="color:var(--muted);font-size:13px;">Break-even check: E85 price would need to fall to ~₹79.2/L (from ₹82/L) to match Petrol's running cost — a small ~3.4% price gap standing between E85 and cost-parity.</p>
+  </div>
+</section>
+
+<!-- FUEL CARDS -->
+<section>
+  <h2>Fuel Cards</h2>
+  <div class="fuel-cards">
+    <div class="fuel-card best">
+      <div class="icon">🔋</div>
+      <div class="name">Electric (EV)</div>
+      <div class="stat">₹/km: <b>1.75</b></div>
+      <div class="stat">CO₂/km: <b>0.091 kg</b></div>
+      <div class="stat">Recharge: <b>45 min</b></div>
+      <span class="badge good">Best Score · 93</span>
+    </div>
+    <div class="fuel-card">
+      <div class="icon">🛢️</div>
+      <div class="name">CNG</div>
+      <div class="stat">₹/km: <b>3.32</b></div>
+      <div class="stat">CO₂/km: <b>0.125 kg</b></div>
+      <div class="stat">Refuel: <b>8 min</b></div>
+      <span class="badge good">Score · 55</span>
+    </div>
+    <div class="fuel-card">
+      <div class="icon">🌽</div>
+      <div class="name">E85 (Flex-Fuel)</div>
+      <div class="stat">₹/km: <b>6.37</b></div>
+      <div class="stat">CO₂/km: <b>0.070 kg</b></div>
+      <div class="stat">Refuel: <b>5 min</b></div>
+      <span class="badge good">Score · 53</span>
+    </div>
+    <div class="fuel-card you">
+      <div class="icon">⛽</div>
+      <div class="name">Petrol (E20)</div>
+      <div class="stat">₹/km: <b>6.15</b></div>
+      <div class="stat">CO₂/km: <b>0.171 kg</b></div>
+      <div class="stat">Refuel: <b>5 min</b></div>
+      <span class="badge you-badge">Your Activa · Score 22</span>
+    </div>
+    <div class="fuel-card">
+      <div class="icon">🚛</div>
+      <div class="name">Diesel</div>
+      <div class="stat">₹/km: <b>4.67</b></div>
+      <div class="stat">CO₂/km: <b>0.179 kg</b></div>
+      <div class="stat">Refuel: <b>5 min</b></div>
+      <span class="badge good">Score · 15</span>
+    </div>
+  </div>
+</section>
+
+<footer>Generated from day17_e85_dataset_optimised.csv · 52 records · Reference vehicle: Honda Activa 6G (Petrol, City, 1,000 km/mo, 3 yrs)</footer>
+
+<script>
+Chart.defaults.color = '#8b93a7';
+Chart.defaults.borderColor = '#2a3348';
+
+// BAR CHART
+new Chart(document.getElementById('fuelBarChart'), {
+  type: 'bar',
+  data: {
+    labels: ['EV','CNG','Diesel','Petrol (E20)','E85'],
+    datasets: [
+      {label:'₹/km', data:[1.75,3.32,4.67,6.15,6.37], backgroundColor:'#4fd1c5'},
+      {label:'CO₂ kg/km ×10', data:[0.91,1.25,1.79,1.71,0.70], backgroundColor:'#f6ad55'},
+      {label:'Maint ₹/km', data:[0.23,0.66,1.00,0.47,0.46], backgroundColor:'#fc8181'}
+    ]
+  },
+  options: { responsive:true, plugins:{legend:{labels:{color:'#e8ecf5'}}} }
+});
+
+// DOUGHNUT CHART
+new Chart(document.getElementById('doughnutChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['EV','CNG','Diesel','Petrol (E20)','E85'],
+    datasets: [{
+      data: [1.75,3.32,4.67,6.15,6.37],
+      backgroundColor: ['#4fd1c5','#63b3ed','#fc8181','#f6ad55','#b794f6'],
+      borderColor: '#171d2b',
+      borderWidth: 2
+    }]
+  },
+  options: { responsive:true, plugins:{legend:{position:'bottom',labels:{color:'#e8ecf5',boxWidth:12,font:{size:11}}}} }
+});
+
+// LINE CHART (age buckets)
+new Chart(document.getElementById('lineChart'), {
+  type: 'line',
+  data: {
+    labels: ['New (0-2y)','Mid-life (3-5y)','Aged (6-9y)','Old (10+y)'],
+    datasets: [
+      {label:'₹/km', data:[4.23,4.09,5.17,5.29], borderColor:'#4fd1c5', backgroundColor:'rgba(79,209,197,.15)', fill:true, tension:.3},
+      {label:'Maint ₹/km', data:[0.35,0.56,0.65,1.41], borderColor:'#fc8181', backgroundColor:'rgba(252,129,129,.15)', fill:true, tension:.3}
+    ]
+  },
+  options: { responsive:true, plugins:{legend:{labels:{color:'#e8ecf5',boxWidth:12,font:{size:11}}}} }
+});
+
+// GAUGE CHART (doughnut trick, E85 score = 53/100)
+new Chart(document.getElementById('gaugeChart'), {
+  type: 'doughnut',
+  data: {
+    datasets: [{
+      data: [53, 47],
+      backgroundColor: ['#4fd1c5', '#252d42'],
+      borderWidth: 0,
+      circumference: 180,
+      rotation: 270,
+      cutout: '75%'
+    }]
+  },
+  options: {
+    responsive:true,
+    plugins:{legend:{display:false}, tooltip:{enabled:false}}
+  }
+});
+</script>
+</body>
+</html>
