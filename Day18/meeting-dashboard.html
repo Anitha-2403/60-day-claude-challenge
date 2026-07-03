@@ -1,0 +1,491 @@
+<style>
+  :root {
+    --bg: #f5f6fa;
+    --card-bg: #ffffff;
+    --text-primary: #1a1d29;
+    --text-secondary: #6b7280;
+    --border: #e5e7eb;
+    --accent: #4f46e5;
+    --red: #ef4444;
+    --red-bg: #fee2e2;
+    --orange: #f59e0b;
+    --orange-bg: #fef3c7;
+    --green: #10b981;
+    --green-bg: #d1fae5;
+    --purple: #8b5cf6;
+    --purple-bg: #ede9fe;
+    --blue: #3b82f6;
+    --blue-bg: #dbeafe;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-hover: 0 4px 12px rgba(0,0,0,0.08);
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.5;
+  }
+
+  .dashboard {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    color: #fff;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+
+  .header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .header .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 13px;
+    opacity: 0.92;
+    margin-top: 10px;
+  }
+
+  .header .meta span {
+    background: rgba(255,255,255,0.15);
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  .progress-wrap {
+    margin-top: 16px;
+  }
+
+  .progress-label {
+    font-size: 12.5px;
+    margin-bottom: 6px;
+    opacity: 0.9;
+  }
+
+  .progress-bar-bg {
+    background: rgba(255,255,255,0.25);
+    border-radius: 20px;
+    height: 10px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    background: #fff;
+    height: 100%;
+    border-radius: 20px;
+    width: 75%;
+  }
+
+  .section {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+  }
+
+  .section-title .icon {
+    font-size: 18px;
+  }
+
+  .summary-text {
+    color: var(--text-secondary);
+    font-size: 14.5px;
+  }
+
+  .attendees {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .attendee-chip {
+    background: var(--purple-bg);
+    color: var(--purple);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+  }
+
+  .card {
+    background: #fafaff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+
+  .card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+  }
+
+  .card-title {
+    font-weight: 600;
+    font-size: 13.5px;
+    margin-bottom: 6px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+
+  thead th {
+    text-align: left;
+    padding: 10px 12px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    border-bottom: 2px solid var(--border);
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  tbody td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  tbody tr:hover {
+    background: #fafaff;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .badge-pending { background: var(--orange-bg); color: #b45309; }
+  .badge-high { background: var(--red-bg); color: #b91c1c; }
+  .badge-medium { background: var(--orange-bg); color: #b45309; }
+  .badge-question { background: var(--purple-bg); color: #6d28d9; }
+  .badge-completed { background: var(--green-bg); color: #047857; }
+  .badge-decision { background: var(--blue-bg); color: #1d4ed8; }
+
+  .owner-tag {
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  ul.list-items {
+    list-style: none;
+  }
+
+  ul.list-items li {
+    padding: 12px 14px;
+    background: #fafaff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-size: 13.5px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  ul.list-items li:last-child { margin-bottom: 0; }
+
+  .risk-item { border-left: 4px solid var(--red); }
+  .blocker-item { border-left: 4px solid var(--orange); }
+  .question-item { border-left: 4px solid var(--purple); }
+  .decision-item { border-left: 4px solid var(--blue); }
+
+  details {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    background: #fafaff;
+    margin-bottom: 10px;
+  }
+
+  details:last-child { margin-bottom: 0; }
+
+  details summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13.5px;
+    outline: none;
+  }
+
+  details[open] summary {
+    margin-bottom: 10px;
+  }
+
+  .details-content {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+  }
+
+  .next-meeting {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    background: var(--green-bg);
+    color: #047857;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .next-meeting span {
+    background: rgba(4,120,87,0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+  }
+
+  @media (max-width: 640px) {
+    .header { padding: 20px; }
+    .section { padding: 18px; }
+    table, thead, tbody, th, td, tr { display: block; }
+    thead { display: none; }
+    tbody tr {
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+    }
+    tbody td {
+      border: none;
+      padding: 6px 4px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    tbody td::before {
+      content: attr(data-label);
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+  }
+</style>
+
+<div class="dashboard">
+
+  <div class="header">
+    <h1>Global AI Product Development — Project Meeting Notes</h1>
+    <div class="meta">
+      <span>📅 15 July 2026</span>
+      <span>⏰ 10:00 AM – 11:15 AM</span>
+      <span>👥 7 Attendees</span>
+      <span>💻 Microsoft Teams</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label">AI Dashboard Project Progress: 75% Complete</div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="section">
+    <div class="section-title"><span class="icon">📝</span> Summary</div>
+    <p class="summary-text">
+      Sarah opened the meeting and reviewed objectives. David reported the AI Dashboard project is 75% complete. Emily flagged a delay in backend API integration pending security review. Michael completed the first version of the customer analytics dataset, though additional validation is required. Priya confirmed the testing environment is ready, with functional testing to begin after backend integration. James confirmed the staging server has been configured successfully. Olivia noted the client requested an additional analytics report. The team discussed JWT vs OAuth for authentication without reaching a final decision. Sarah emphasized that the client demonstration is scheduled for next Friday and all critical features should be completed before then.
+    </p>
+    <div class="attendees">
+      <span class="attendee-chip">Sarah Johnson – Project Manager</span>
+      <span class="attendee-chip">David Chen – Product Manager</span>
+      <span class="attendee-chip">Emily Rodriguez – Technical Lead</span>
+      <span class="attendee-chip">Michael Brown – Data Engineer</span>
+      <span class="attendee-chip">Priya Sharma – QA Lead</span>
+      <span class="attendee-chip">James Wilson – DevOps Engineer</span>
+      <span class="attendee-chip">Olivia Taylor – Business Analyst</span>
+    </div>
+  </div>
+
+  <!-- Key Takeaways -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🔑</span> Key Takeaways</div>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-title">📈 Project Status</div>
+        <div class="card-desc">AI Dashboard project is currently 75% complete.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔗 Backend Integration</div>
+        <div class="card-desc">Delayed because the security review has not yet been completed.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Dataset</div>
+        <div class="card-desc">First version of customer analytics dataset completed; additional validation required before production deployment.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">🧪 Testing</div>
+        <div class="card-desc">Testing environment is ready; functional testing begins after backend integration.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">🖥️ Staging Server</div>
+        <div class="card-desc">Configured successfully by James.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">📄 Client Request</div>
+        <div class="card-desc">Additional analytics report requested to be included in the dashboard.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔐 Authentication</div>
+        <div class="card-desc">JWT vs OAuth discussed; no final decision made.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">🎯 Client Demo</div>
+        <div class="card-desc">Scheduled for next Friday; all critical features should be completed before then.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Items -->
+  <div class="section">
+    <div class="section-title"><span class="icon">✅</span> Action Items</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>Owner</th>
+          <th>Deadline</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-label="Task">Complete backend API integration</td>
+          <td data-label="Owner"><span class="owner-tag">Emily Rodriguez</span></td>
+          <td data-label="Deadline">18 July 2026</td>
+          <td data-label="Status"><span class="badge badge-pending">⏳ Pending</span></td>
+        </tr>
+        <tr>
+          <td data-label="Task">Finish dataset validation</td>
+          <td data-label="Owner"><span class="owner-tag">Michael Brown</span></td>
+          <td data-label="Deadline">17 July 2026</td>
+          <td data-label="Status"><span class="badge badge-pending">⏳ Pending</span></td>
+        </tr>
+        <tr>
+          <td data-label="Task">Complete functional testing</td>
+          <td data-label="Owner"><span class="owner-tag">Priya Sharma</span></td>
+          <td data-label="Deadline">19 July 2026</td>
+          <td data-label="Status"><span class="badge badge-pending">⏳ Pending</span></td>
+        </tr>
+        <tr>
+          <td data-label="Task">Prepare production deployment checklist</td>
+          <td data-label="Owner"><span class="owner-tag">James Wilson</span></td>
+          <td data-label="Deadline">18 July 2026</td>
+          <td data-label="Status"><span class="badge badge-pending">⏳ Pending</span></td>
+        </tr>
+        <tr>
+          <td data-label="Task">Collect client feedback and confirm reporting requirements</td>
+          <td data-label="Owner"><span class="owner-tag">Olivia Taylor</span></td>
+          <td data-label="Deadline">17 July 2026</td>
+          <td data-label="Status"><span class="badge badge-pending">⏳ Pending</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Open Questions -->
+  <div class="section">
+    <div class="section-title"><span class="icon">❓</span> Open Questions</div>
+    <ul class="list-items">
+      <li class="question-item"><span class="badge badge-question">❓ Open Question</span> Should authentication use JWT or OAuth?</li>
+      <li class="question-item"><span class="badge badge-question">❓ Open Question</span> Will the client approve the additional analytics dashboard?</li>
+      <li class="question-item"><span class="badge badge-question">❓ Open Question</span> Is an extra testing cycle required before deployment?</li>
+    </ul>
+  </div>
+
+  <!-- Risks / Blockers -->
+  <div class="section">
+    <div class="section-title"><span class="icon">⚠️</span> Risks / Blockers</div>
+    <ul class="list-items">
+      <li class="risk-item"><span class="badge badge-high">🔴 High Priority</span> Risk: Security approval may delay API integration.</li>
+      <li class="risk-item"><span class="badge badge-medium">🟠 Medium Priority</span> Risk: Dataset validation may take longer than expected.</li>
+      <li class="risk-item"><span class="badge badge-medium">🟠 Medium Priority</span> Risk: Client feedback could introduce new feature requests.</li>
+      <li class="blocker-item"><span class="badge badge-pending">⏳ Pending</span> Blocker: Security team has not approved API access.</li>
+      <li class="blocker-item"><span class="badge badge-pending">⏳ Pending</span> Blocker: Client has not finalized reporting requirements.</li>
+    </ul>
+  </div>
+
+  <!-- Conflicts -->
+  <div class="section">
+    <div class="section-title"><span class="icon">⚠️</span> Conflicts</div>
+    <p class="summary-text">Not specified</p>
+  </div>
+
+  <!-- Decisions -->
+  <div class="section">
+    <div class="section-title"><span class="icon">📌</span> Decisions</div>
+    <ul class="list-items">
+      <li class="decision-item"><span class="badge badge-decision">📌 Decision</span> Proceed with current project timeline.</li>
+      <li class="decision-item"><span class="badge badge-decision">📌 Decision</span> Complete all pending tasks before the client demonstration.</li>
+      <li class="decision-item"><span class="badge badge-decision">📌 Decision</span> Review authentication architecture in the next meeting.</li>
+    </ul>
+  </div>
+
+  <!-- Additional Notes -->
+  <div class="section">
+    <div class="section-title"><span class="icon">🗂️</span> Additional Notes</div>
+    <details>
+      <summary>View Additional Notes</summary>
+      <div class="details-content">
+        Sarah welcomed everyone and reviewed the objectives for the meeting at the start of the session.
+      </div>
+    </details>
+  </div>
+
+  <!-- Next Meeting -->
+  <div class="section">
+    <div class="section-title"><span class="icon">📆</span> Next Meeting</div>
+    <div class="next-meeting">
+      📅 18 July 2026 <span>⏰ 3:00 PM</span> <span>💻 Microsoft Teams</span>
+    </div>
+  </div>
+
+</div>
