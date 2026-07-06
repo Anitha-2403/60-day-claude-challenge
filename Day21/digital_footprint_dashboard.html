@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Digital Footprint & Privacy Dashboard</title>
+<style>
+:root{
+  --bg:#0b0e14; --panel:#12151d; --panel2:#161a24; --border:#232838;
+  --text:#e7e9ee; --muted:#8b93a7; --faint:#5b6377;
+  --accent:#5b8cff; --teal:#22c3a6; --amber:#f2a93c; --red:#ef5468; --green:#3ecf8e; --purple:#9d7bff;
+  --radius:14px;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+  line-height:1.5;
+}
+.wrap{max-width:1200px;margin:0 auto;padding:32px 24px 80px;}
+.top{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
+.top h1{font-size:26px;font-weight:600;margin:0 0 4px;}
+.top p{color:var(--muted);margin:0;font-size:13.5px;}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:5px 11px;border-radius:20px;border:1px solid var(--border);color:var(--muted);background:var(--panel);}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+
+.grid{display:grid;gap:16px;}
+.g4{grid-template-columns:repeat(4,1fr);}
+.g3{grid-template-columns:repeat(3,1fr);}
+.g2{grid-template-columns:repeat(2,1fr);}
+@media(max-width:900px){.g4,.g3,.g2{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.g4,.g3,.g2{grid-template-columns:1fr;}}
+
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px;}
+.card h2{font-size:15px;font-weight:600;margin:0 0 4px;display:flex;align-items:center;gap:8px;}
+.card .sub{color:var(--muted);font-size:12.5px;margin:0 0 16px;}
+.section{margin-top:32px;}
+
+.metric{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:left;}
+.metric .label{font-size:12px;color:var(--muted);margin-bottom:6px;}
+.metric .value{font-size:26px;font-weight:700;}
+.metric .note{font-size:11.5px;color:var(--faint);margin-top:4px;}
+
+.scorewrap{display:flex;align-items:center;gap:20px;}
+.ring{position:relative;width:120px;height:120px;flex:none;}
+.ring svg{transform:rotate(-90deg);}
+.ring .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+.ring .num b{font-size:26px;}
+.ring .num span{font-size:11px;color:var(--muted);}
+.tier{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;margin-top:8px;}
+
+.bar-row{display:grid;grid-template-columns:120px 1fr 46px;align-items:center;gap:10px;margin-bottom:10px;font-size:13px;}
+.bar-track{background:#1b2030;border-radius:6px;height:10px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:6px;}
+
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{text-align:left;color:var(--muted);font-weight:500;font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;padding:8px 10px;border-bottom:1px solid var(--border);}
+td{padding:10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+.pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11.5px;font-weight:600;}
+.pill.low{background:rgba(62,207,142,.14);color:var(--green);}
+.pill.mod{background:rgba(242,169,60,.14);color:var(--amber);}
+.pill.high{background:rgba(239,84,104,.14);color:var(--red);}
+.pill.est{background:rgba(157,123,255,.14);color:var(--purple);}
+.pill.fact{background:rgba(91,140,255,.14);color:var(--accent);}
+
+.heatgrid{display:grid;grid-template-columns:140px repeat(6,1fr);gap:4px;font-size:11px;}
+.heatgrid .hlabel{color:var(--muted);display:flex;align-items:center;padding-right:6px;font-size:12px;}
+.heatgrid .hcol{color:var(--muted);text-align:center;padding-bottom:6px;font-size:10.5px;}
+.heatcell{height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;color:#0b0e14;}
+
+.radar-wrap{display:flex;justify-content:center;}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:10px;justify-content:center;}
+.legend span{display:inline-flex;align-items:center;gap:5px;}
+.sq{width:9px;height:9px;border-radius:2px;display:inline-block;}
+
+.twin-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:700px){.twin-grid{grid-template-columns:1fr;}}
+.twin-item{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.twin-item h3{margin:0 0 6px;font-size:13px;color:var(--muted);font-weight:500;}
+.twin-item p{margin:0;font-size:13.5px;}
+
+.asset-card{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:16px;}
+.asset-card .top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.asset-card h3{margin:0;font-size:14px;}
+.val-badge{font-size:12px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.v-high{background:rgba(239,84,104,.14);color:var(--red);}
+.v-med{background:rgba(242,169,60,.14);color:var(--amber);}
+.v-low{background:rgba(34,195,166,.14);color:var(--teal);}
+.asset-card p{margin:0;font-size:12.5px;color:var(--muted);}
+
+.sim-wrap{display:flex;flex-direction:column;gap:14px;}
+.sim-row{display:flex;align-items:center;justify-content:space-between;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;}
+.sim-row label{font-size:13.5px;display:flex;align-items:center;gap:10px;}
+.toggle{position:relative;width:42px;height:23px;border-radius:20px;background:#232838;cursor:pointer;transition:.2s;flex:none;}
+.toggle.on{background:var(--green);}
+.toggle::after{content:"";position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:#fff;transition:.2s;}
+.toggle.on::after{left:21px;}
+.sim-impact{font-size:12px;color:var(--muted);min-width:70px;text-align:right;}
+
+.verdict{background:linear-gradient(180deg, var(--panel2), var(--panel));border:1px solid var(--border);border-radius:var(--radius);padding:24px;}
+.verdict h2{margin:0 0 10px;font-size:17px;}
+.verdict p{margin:0 0 10px;font-size:14px;color:var(--text);}
+.disclaimer{margin-top:28px;padding:16px 20px;border:1px dashed var(--border);border-radius:12px;font-size:12px;color:var(--faint);}
+.factnote{font-size:11px;color:var(--faint);margin-top:2px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div>
+      <h1>Digital Footprint & Privacy Dashboard</h1>
+      <p>Estimate-based analysis derived from self-reported app usage. No private databases accessed.</p>
+    </div>
+    <div class="badge"><span class="dot"></span> Analysis generated locally from provided facts</div>
+  </div>
+
+  <div class="grid g4 section" style="margin-top:0;">
+    <div class="metric">
+      <div class="label">Total services used</div>
+      <div class="value">15</div>
+      <div class="note">Fact — as reported</div>
+    </div>
+    <div class="metric">
+      <div class="label">Parent companies</div>
+      <div class="value">7</div>
+      <div class="note">Fact — inferred ownership</div>
+    </div>
+    <div class="metric">
+      <div class="label">Ecosystem concentration</div>
+      <div class="value">68<span style="font-size:14px;color:var(--muted);">/100</span></div>
+      <div class="note">Estimate — Google + Meta weighting</div>
+    </div>
+    <div class="metric">
+      <div class="label">Estimated tracking surface</div>
+      <div class="value">High</div>
+      <div class="note">Estimate — cross-service overlap</div>
+    </div>
+  </div>
+
+  <div class="grid g2 section">
+    <div class="card">
+      <h2>Digital Footprint Score</h2>
+      <p class="sub">Composite of service count, category breadth and platform reach</p>
+      <div class="scorewrap">
+        <div class="ring">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" stroke="#1b2030" stroke-width="12" fill="none"/>
+            <circle cx="60" cy="60" r="52" stroke="#f2a93c" stroke-width="12" fill="none"
+              stroke-dasharray="326.7" stroke-dashoffset="90.5" stroke-linecap="round"/>
+          </svg>
+          <div class="num"><b>72</b><span>/ 100</span></div>
+        </div>
+        <div>
+          <div class="tier" style="background:rgba(242,169,60,.15);color:var(--amber);">🟠 Significant exposure</div>
+          <p style="font-size:12.5px;color:var(--muted);margin-top:10px;">Driven by broad category coverage: social, messaging, commerce, entertainment, gaming and payments all represented in the reported footprint (Fact).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Privacy Score</h2>
+      <p class="sub">Estimate of protective posture based on typical default settings for these services</p>
+      <div class="scorewrap">
+        <div class="ring">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" stroke="#1b2030" stroke-width="12" fill="none"/>
+            <circle cx="60" cy="60" r="52" stroke="#ef5468" stroke-width="12" fill="none"
+              stroke-dasharray="326.7" stroke-dashoffset="212.4" stroke-linecap="round"/>
+          </svg>
+          <div class="num"><b>35</b><span>/ 100</span></div>
+        </div>
+        <div>
+          <div class="tier" style="background:rgba(239,84,104,.15);color:var(--red);">🔴 Weak (Estimate)</div>
+          <p style="font-size:12.5px;color:var(--muted);margin-top:10px;">Assumes default privacy settings unless stated otherwise — actual score depends on individual account configuration, which is unknown.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card section">
+    <h2>Exposure Heatmap</h2>
+    <p class="sub">Estimated data exposure intensity by service across common tracking categories</p>
+    <div class="heatgrid">
+      <div></div>
+      <div class="hcol">Identity</div>
+      <div class="hcol">Location</div>
+      <div class="hcol">Social graph</div>
+      <div class="hcol">Behavior</div>
+      <div class="hcol">Financial</div>
+      <div class="hcol">Media/biometric</div>
+
+      <div class="hlabel">Instagram</div>
+      <div class="heatcell" style="background:#ef5468;">H</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#ef5468;">H</div>
+      <div class="heatcell" style="background:#ef5468;">H</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#ef5468;">H</div>
+
+      <div class="hlabel">Snapchat</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#ef5468;">H</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#ef5468;">H</div>
+
+      <div class="hlabel">TikTok</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#ef5468;">H</div>
+      <div class="heatcell" style="background:#ef5468;">H</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+
+      <div class="hlabel">YouTube</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#ef5468;">H</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+
+      <div class="hlabel">Discord</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+
+      <div class="hlabel">WhatsApp</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#ef5468;">H</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+
+      <div class="hlabel">iMessage</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+
+      <div class="hlabel">Spotify</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+
+      <div class="hlabel">Roblox</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+
+      <div class="hlabel">PUBG Mobile</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+
+      <div class="hlabel">Amazon</div>
+      <div class="heatcell" style="background:#ef5468;">H</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#ef5468;">H</div>
+      <div class="heatcell" style="background:#ef5468;">H</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+
+      <div class="hlabel">Meesho</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+
+      <div class="hlabel">Google Search</div>
+      <div class="heatcell" style="background:#ef5468;">H</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#ef5468;">H</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+
+      <div class="hlabel">Google Pay</div>
+      <div class="heatcell" style="background:#ef5468;">H</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#ef5468;">H</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+
+      <div class="hlabel">Google Photos</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#f2a93c;">M</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#3ecf8e;">L</div>
+      <div class="heatcell" style="background:#ef5468;">H</div>
+    </div>
+    <p class="factnote">Estimate. L = Low, M = Moderate, H = High relative exposure per category. Based on known typical data collection scopes for each platform type, not confirmed account-level settings.</p>
+  </div>
+
+  <div class="card section">
+    <h2>Company Exposure Ranking</h2>
+    <p class="sub">Parent companies ranked by estimated share of the user's overall footprint</p>
+
+    <div class="bar-row"><div>Meta</div><div class="bar-track"><div class="bar-fill" style="width:88%;background:var(--red);"></div></div><div>88</div></div>
+    <div class="bar-row"><div>Google / Alphabet</div><div class="bar-track"><div class="bar-fill" style="width:82%;background:var(--red);"></div></div><div>82</div></div>
+    <div class="bar-row"><div>Amazon</div><div class="bar-track"><div class="bar-fill" style="width:58%;background:var(--amber);"></div></div><div>58</div></div>
+    <div class="bar-row"><div>ByteDance</div><div class="bar-track"><div class="bar-fill" style="width:52%;background:var(--amber);"></div></div><div>52</div></div>
+    <div class="bar-row"><div>Discord Inc.</div><div class="bar-track"><div class="bar-fill" style="width:30%;background:var(--teal);"></div></div><div>30</div></div>
+    <div class="bar-row"><div>Krafton (PUBG)</div><div class="bar-track"><div class="bar-fill" style="width:26%;background:var(--teal);"></div></div><div>26</div></div>
+    <div class="bar-row"><div>Meesho / Spotify AB</div><div class="bar-track"><div class="bar-fill" style="width:22%;background:var(--teal);"></div></div><div>22</div></div>
+
+    <p class="factnote">Fact: parent company mapping (Instagram/WhatsApp → Meta; YouTube/Search/Pay/Photos → Alphabet; TikTok → ByteDance; PUBG Mobile → Krafton; Roblox → Roblox Corp; Amazon and Meesho are independent; Snapchat → Snap Inc.; iMessage → Apple; Spotify → Spotify AB). Ranking weight is an Estimate based on category depth and cross-linking of services under one company.</p>
+  </div>
+
+  <div class="grid g2 section">
+    <div class="card">
+      <h2>Data Collection Matrix</h2>
+      <p class="sub">Likelihood a given data type is collected, by service category</p>
+      <table>
+        <tr><th>Data type</th><th>Likelihood</th><th>Basis</th></tr>
+        <tr><td>Contact list / social graph</td><td><span class="pill high">High</span></td><td><span class="pill fact">Fact</span></td></tr>
+        <tr><td>Precise / approximate location</td><td><span class="pill high">High</span></td><td><span class="pill est">Estimate</span></td></tr>
+        <tr><td>Purchase history</td><td><span class="pill high">High</span></td><td><span class="pill est">Estimate</span></td></tr>
+        <tr><td>Search & browsing behavior</td><td><span class="pill high">High</span></td><td><span class="pill est">Estimate</span></td></tr>
+        <tr><td>Payment / financial signals</td><td><span class="pill mod">Moderate</span></td><td><span class="pill est">Estimate</span></td></tr>
+        <tr><td>Media / photo content & metadata</td><td><span class="pill mod">Moderate</span></td><td><span class="pill est">Estimate</span></td></tr>
+        <tr><td>Voice / gameplay behavior</td><td><span class="pill mod">Moderate</span></td><td><span class="pill est">Estimate</span></td></tr>
+        <tr><td>Biometric-adjacent (face in photos/video)</td><td><span class="pill mod">Moderate</span></td><td><span class="pill est">Estimate</span></td></tr>
+        <tr><td>Device / network identifiers</td><td><span class="pill high">High</span></td><td><span class="pill fact">Fact</span></td></tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <h2>Risk Radar</h2>
+      <p class="sub">Estimated relative exposure across risk dimensions</p>
+      <div class="radar-wrap">
+        <svg width="260" height="240" viewBox="0 0 260 240">
+          <polygon points="130,20 220,80 220,170 130,220 40,170 40,80" fill="none" stroke="#232838" stroke-width="1"/>
+          <polygon points="130,55 190,95 190,150 130,190 70,150 70,95" fill="none" stroke="#232838" stroke-width="1"/>
+          <polygon points="130,90 160,110 160,135 130,155 100,135 100,110" fill="none" stroke="#232838" stroke-width="1"/>
+          <polygon points="130,32 205,85 200,160 130,205 55,158 48,88"
+            fill="rgba(239,84,104,0.22)" stroke="#ef5468" stroke-width="2"/>
+          <circle cx="130" cy="32" r="3" fill="#ef5468"/>
+          <circle cx="205" cy="85" r="3" fill="#ef5468"/>
+          <circle cx="200" cy="160" r="3" fill="#ef5468"/>
+          <circle cx="130" cy="205" r="3" fill="#ef5468"/>
+          <circle cx="55" cy="158" r="3" fill="#ef5468"/>
+          <circle cx="48" cy="88" r="3" fill="#ef5468"/>
+          <text x="130" y="12" fill="#8b93a7" font-size="10" text-anchor="middle">Social exposure</text>
+          <text x="228" y="80" fill="#8b93a7" font-size="10" text-anchor="start">Financial</text>
+          <text x="228" y="175" fill="#8b93a7" font-size="10" text-anchor="start">Commerce</text>
+          <text x="130" y="234" fill="#8b93a7" font-size="10" text-anchor="middle">Location</text>
+          <text x="32" y="175" fill="#8b93a7" font-size="10" text-anchor="end">Entertainment</text>
+          <text x="32" y="80" fill="#8b93a7" font-size="10" text-anchor="end">Communication</text>
+        </svg>
+      </div>
+      <p class="factnote" style="text-align:center;">Estimate — relative shape only, not calibrated against external benchmarks.</p>
+    </div>
+  </div>
+
+  <div class="card section">
+    <h2>Digital Twin Profile</h2>
+    <p class="sub">A speculative behavioral sketch. All points below are Estimates — none reflect confirmed personal data.</p>
+    <div class="twin-grid">
+      <div class="twin-item"><h3>Likely age range</h3><p>Estimate: teen to young-adult, based on gaming (Roblox, PUBG Mobile) and short-form video usage combined with messaging patterns.</p></div>
+      <div class="twin-item"><h3>Shopping behavior</h3><p>Estimate: price-conscious, mobile-first shopper, given joint use of Amazon and Meesho (a value-oriented marketplace).</p></div>
+      <div class="twin-item"><h3>Entertainment habits</h3><p>Estimate: high video/audio consumption via YouTube, TikTok and Spotify, suggesting frequent short-session media use.</p></div>
+      <div class="twin-item"><h3>Communication style</h3><p>Estimate: multi-platform communicator using both regional (WhatsApp) and ecosystem-native (iMessage) messaging.</p></div>
+      <div class="twin-item"><h3>Social engagement</h3><p>Estimate: active visual-social user across Instagram, Snapchat and TikTok, indicating high content-sharing frequency.</p></div>
+      <div class="twin-item"><h3>Financial digitization</h3><p>Estimate: comfortable with digital payments via Google Pay, implying moderate-to-high UPI/digital transaction reliance.</p></div>
+      <div class="twin-item"><h3>Mobility / travel signals</h3><p>Not enough information provided.</p></div>
+      <div class="twin-item"><h3>Technology environment</h3><p>Estimate: primarily Android/Google ecosystem, inferred from Google Pay, Photos and Search usage alongside cross-platform apps.</p></div>
+    </div>
+  </div>
+
+  <div class="card section">
+    <h2>Most Valuable Data Assets</h2>
+    <p class="sub">Which reported data points are most commercially valuable to advertisers and platforms</p>
+    <div class="grid g3">
+      <div class="asset-card">
+        <div class="top-row"><h3>Social graph</h3><span class="val-badge v-high">High value</span></div>
+        <p>Contact and follower networks across Instagram, Snapchat, TikTok and WhatsApp. Fact of usage; value ranking is an Estimate.</p>
+      </div>
+      <div class="asset-card">
+        <div class="top-row"><h3>Purchase intent data</h3><span class="val-badge v-high">High value</span></div>
+        <p>Amazon + Meesho + Google Pay combined signal is Estimated to be highly valuable for targeted advertising.</p>
+      </div>
+      <div class="asset-card">
+        <div class="top-row"><h3>Search history</h3><span class="val-badge v-high">High value</span></div>
+        <p>Google Search activity is Estimated to be a core input for ad personalization and interest profiling.</p>
+      </div>
+      <div class="asset-card">
+        <div class="top-row"><h3>Content consumption</h3><span class="val-badge v-med">Medium value</span></div>
+        <p>YouTube, TikTok and Spotify listening/viewing habits, Estimated to shape recommendation and ad-targeting models.</p>
+      </div>
+      <div class="asset-card">
+        <div class="top-row"><h3>Photo/media metadata</h3><span class="val-badge v-med">Medium value</span></div>
+        <p>Google Photos storage is Estimated to include location and device metadata tied to images.</p>
+      </div>
+      <div class="asset-card">
+        <div class="top-row"><h3>In-game behavior</h3><span class="val-badge v-low">Lower value</span></div>
+        <p>Roblox and PUBG Mobile session data, Estimated as lower external ad value but useful for platform retention modeling.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card section">
+    <h2>Privacy Improvement Simulator</h2>
+    <p class="sub">Toggle actions to see illustrative impact on your Estimated privacy score</p>
+    <div class="sim-wrap">
+      <div class="sim-row"><label><span class="toggle" onclick="toggleSim(this,6)"></span> Limit ad personalization on Google account</label><span class="sim-impact">+6 pts</span></div>
+      <div class="sim-row"><label><span class="toggle" onclick="toggleSim(this,5)"></span> Set Instagram/TikTok/Snapchat to private</label><span class="sim-impact">+5 pts</span></div>
+      <div class="sim-row"><label><span class="toggle" onclick="toggleSim(this,4)"></span> Disable precise location on social apps</label><span class="sim-impact">+4 pts</span></div>
+      <div class="sim-row"><label><span class="toggle" onclick="toggleSim(this,3)"></span> Review Amazon/Meesho data-sharing settings</label><span class="sim-impact">+3 pts</span></div>
+      <div class="sim-row"><label><span class="toggle" onclick="toggleSim(this,3)"></span> Turn off Google Photos face grouping</label><span class="sim-impact">+3 pts</span></div>
+      <div class="sim-row"><label><span class="toggle" onclick="toggleSim(this,2)"></span> Restrict Discord DM/friend-request defaults</label><span class="sim-impact">+2 pts</span></div>
+    </div>
+    <div class="metric" style="margin-top:16px;max-width:260px;">
+      <div class="label">Simulated privacy score</div>
+      <div class="value" id="simScore">35</div>
+      <div class="note">Estimate — illustrative only</div>
+    </div>
+  </div>
+
+  <div class="verdict section">
+    <h2>Final Verdict</h2>
+    <p><b>Footprint:</b> based on the 15 reported services across 7 estimated parent companies, this profile shows a broad, multi-category digital presence spanning social, messaging, commerce, entertainment, gaming and payments (Fact of usage).</p>
+    <p><b>Concentration:</b> a significant share of activity is estimated to route through two ecosystems — Google/Alphabet and Meta — which increases cross-service correlation potential (Estimate).</p>
+    <p><b>Overall posture:</b> Digital Footprint Score of 72 (Significant) paired with a Privacy Score of 35 (Weak, Estimate) suggests exposure currently outweighs protective configuration. None of these figures reflect confirmed account settings, confirmed data-sharing agreements, or access to any private or internal company database.</p>
+  </div>
+
+  <div class="disclaimer">
+    This dashboard is generated entirely from the facts explicitly listed by the user. All behavioral, demographic, lifestyle, financial, mobility and technology conclusions are labeled Estimates and are speculative in nature — they are not derived from any private, internal, or third-party database, and no certainty is claimed about any inferred trait. Where information could not reasonably be inferred, this is marked "Not enough information provided."
+  </div>
+
+</div>
+
+<script>
+let simTotal = 35;
+function toggleSim(el, pts){
+  const on = el.classList.toggle('on');
+  simTotal += on ? pts : -pts;
+  document.getElementById('simScore').textContent = simTotal;
+}
+</script>
+</body>
+</html>
