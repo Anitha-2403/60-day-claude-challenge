@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Startup Validation Report — AI Career Guidance Platform</title>
+<style>
+  :root{
+    --navy:#0f2b46;
+    --navy-2:#173d61;
+    --gold:#b8862f;
+    --gold-light:#e8c887;
+    --paper:#fbfaf7;
+    --ink:#1c2530;
+    --muted:#5b6672;
+    --line:#d7dce1;
+    --green:#3f7d5c;
+    --amber:#b8862f;
+    --red:#a8433a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:#e9ebee; color:var(--ink);
+    font-family:"Georgia","Times New Roman",serif;
+    font-size:15px; line-height:1.55;
+  }
+  .page{
+    width:210mm; min-height:297mm; margin:14px auto; padding:20mm 18mm;
+    background:var(--paper); position:relative;
+    box-shadow:0 0 0 1px #cfd4da, 0 6px 18px rgba(0,0,0,.12);
+  }
+  @media print{
+    body{background:#fff;}
+    .page{width:auto; min-height:auto; margin:0; box-shadow:none; padding:16mm 16mm; page-break-after:always;}
+  }
+  h1,h2,h3,h4{ font-family:"Georgia","Times New Roman",serif; color:var(--navy); margin:0 0 6px; }
+  .eyebrow{
+    font-family:Arial,Helvetica,sans-serif; letter-spacing:.14em; text-transform:uppercase;
+    font-size:10.5px; color:var(--gold); font-weight:700; margin-bottom:8px;
+  }
+  .sec-title{ font-size:20px; border-bottom:2px solid var(--navy); padding-bottom:8px; margin-bottom:16px; }
+  .sec-num{ color:var(--gold); font-weight:700; margin-right:8px; }
+  p{margin:0 0 10px;}
+  .muted{color:var(--muted);}
+  small.note{color:var(--muted); font-family:Arial,Helvetica,sans-serif; font-size:11.5px;}
+  ul{margin:6px 0 12px 20px; padding:0;}
+  li{margin-bottom:5px;}
+  table{width:100%; border-collapse:collapse; margin:10px 0 18px; font-family:Arial,Helvetica,sans-serif; font-size:12.5px;}
+  caption{ text-align:left; font-family:Arial,Helvetica,sans-serif; font-weight:700; color:var(--navy);
+    font-size:12px; margin-bottom:6px; text-transform:uppercase; letter-spacing:.04em;}
+  th{ background:var(--navy); color:#fff; text-align:left; padding:7px 9px; font-weight:600;}
+  td{ padding:7px 9px; border-bottom:1px solid var(--line); vertical-align:top;}
+  tr:nth-child(even) td{background:#f2f2ee;}
+  .score{ font-weight:700; }
+  .s5{color:var(--green);} .s4{color:var(--green);} .s3{color:var(--amber);} .s2{color:var(--red);} .s1{color:var(--red);}
+  .badge{ display:inline-block; padding:2px 9px; border-radius:3px; font-family:Arial,sans-serif; font-size:11px; font-weight:700; }
+  .badge-go{ background:#e5f0ea; color:var(--green); }
+  .badge-cond{ background:#fbf1de; color:var(--amber); }
+  .badge-no{ background:#f7e6e4; color:var(--red); }
+  .callout{ border-left:4px solid var(--gold); background:#faf6ec; padding:10px 14px; margin:14px 0; font-size:13.5px;}
+  .grid2{ display:flex; gap:16px; }
+  .grid2 > div{ flex:1; }
+  .kpi{ border:1px solid var(--line); padding:12px 14px; text-align:center; }
+  .kpi .num{ font-size:24px; font-weight:700; color:var(--navy); font-family:Arial,sans-serif;}
+  .kpi .lbl{ font-family:Arial,sans-serif; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em;}
+  .toc-row{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:9px; font-family:Arial,Helvetica,sans-serif; font-size:13.5px;}
+  .toc-row .dots{ flex:1; border-bottom:1px dotted var(--muted); margin:0 6px 3px; }
+  .footer-bar{ position:absolute; bottom:10mm; left:18mm; right:18mm; display:flex; justify-content:space-between;
+    font-family:Arial,sans-serif; font-size:9.5px; color:var(--muted); border-top:1px solid var(--line); padding-top:6px;}
+  .titlepage{ height:100%; display:flex; flex-direction:column; justify-content:space-between; }
+  .titlepage .mark{ font-family:Arial,sans-serif; letter-spacing:.25em; text-transform:uppercase; color:var(--gold); font-size:12px; font-weight:700;}
+  .titlepage h1{ font-size:42px; line-height:1.15; max-width:80%; margin-top:40px;}
+  .titlepage .sub{ font-size:17px; color:var(--muted); max-width:70%; margin-top:10px;}
+  .titlepage .confid{ font-family:Arial,sans-serif; font-size:11px; color:var(--muted); border:1px solid var(--line); display:inline-block; padding:5px 10px;}
+  .rule{ height:3px; background:linear-gradient(90deg,var(--navy),var(--gold)); margin:18px 0; }
+  .print-btn{ position:fixed; top:16px; right:16px; z-index:99; font-family:Arial,sans-serif; background:var(--navy); color:#fff;
+    border:none; padding:10px 16px; border-radius:4px; cursor:pointer; font-size:13px; box-shadow:0 3px 10px rgba(0,0,0,.25);}
+  @media print{ .print-btn{display:none;} }
+</style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">Export / Print to PDF</button>
+
+<!-- PAGE 1 — TITLE -->
+<div class="page">
+  <div class="titlepage">
+    <div>
+      <div class="mark">Startup Validation Report</div>
+      <div class="rule"></div>
+    </div>
+    <div>
+      <h1>AI-Powered Career Readiness Platform for India's Students &amp; Fresh Graduates</h1>
+      <div class="sub">An independent validation of problem severity, market opportunity, founder-market fit, and go-to-market readiness — prepared in a Y Combinator / VC-diligence format.</div>
+      <p style="margin-top:28px; font-family:Arial,sans-serif; font-size:12.5px; color:var(--muted);">
+        Prepared for: <strong>Founder / Early-Stage Team</strong><br>
+        Market focus: <strong>India</strong> — final-year students &amp; fresh graduates (18–25)<br>
+        Classification: <strong>Startup (VC-backable track)</strong><br>
+        Date: <strong>07 July 2026</strong>
+      </p>
+    </div>
+    <div>
+      <span class="confid">CONFIDENTIAL — PREPARED FOR INTERNAL &amp; INVESTOR REVIEW</span>
+      <div class="footer-bar" style="position:static; border:none; margin-top:18px;">
+        <span>Startup Validation Report</span><span>Page 1</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2 — TOC -->
+<div class="page">
+  <div class="eyebrow">Contents</div>
+  <h2 class="sec-title">Table of Contents</h2>
+  <div class="toc-row"><span>1. Executive Summary</span><span class="dots"></span><span>3</span></div>
+  <div class="toc-row"><span>2. Problem Validation</span><span class="dots"></span><span>4</span></div>
+  <div class="toc-row"><span>3. Founder-Market Fit Score</span><span class="dots"></span><span>5</span></div>
+  <div class="toc-row"><span>4. TAM · SAM · SOM Analysis</span><span class="dots"></span><span>6</span></div>
+  <div class="toc-row"><span>5. Competitor Analysis</span><span class="dots"></span><span>7</span></div>
+  <div class="toc-row"><span>6. Market Gap Analysis</span><span class="dots"></span><span>8</span></div>
+  <div class="toc-row"><span>7. Ideal Customer Profile (ICP)</span><span class="dots"></span><span>9</span></div>
+  <div class="toc-row"><span>8. Buyer Persona</span><span class="dots"></span><span>9</span></div>
+  <div class="toc-row"><span>9. Customer Pain Points</span><span class="dots"></span><span>10</span></div>
+  <div class="toc-row"><span>10. Buying Triggers &amp; Objections</span><span class="dots"></span><span>10</span></div>
+  <div class="toc-row"><span>11. Customer Journey</span><span class="dots"></span><span>11</span></div>
+  <div class="toc-row"><span>12. Risk Assessment</span><span class="dots"></span><span>12</span></div>
+  <div class="toc-row"><span>13. Pivot Opportunities</span><span class="dots"></span><span>13</span></div>
+  <div class="toc-row"><span>14. Go / No-Go Recommendation</span><span class="dots"></span><span>14</span></div>
+  <div class="toc-row"><span>15. 30-Day Action Plan</span><span class="dots"></span><span>15</span></div>
+  <div class="toc-row"><span>Appendix — Sources &amp; Definitions</span><span class="dots"></span><span>16</span></div>
+  <div class="callout">
+    <strong>How to read this report:</strong> Figures drawn from public market data are cited in the Appendix. Figures specific to <em>your</em> venture (traction, team, pricing) are marked <strong>[PLACEHOLDER]</strong> where no data has been supplied yet — replace these before sharing with investors.
+  </div>
+  <div class="footer-bar"><span>Startup Validation Report</span><span>Page 2</span></div>
+</div>
+
+<!-- PAGE 3 — EXEC SUMMARY -->
+<div class="page">
+  <div class="eyebrow">Section 1</div>
+  <h2 class="sec-title"><span class="sec-num">1.</span>Executive Summary</h2>
+  <p>The venture proposes an AI-powered platform that helps students and fresh graduates in India build resumes, prepare for interviews, learn in-demand skills, and receive personalized career guidance. The founder has direct lived experience of the problem, which is a genuine asset — but the venture is pre-launch, with no users, waitlist, or paid pilots yet.</p>
+  <p>India's graduate employability gap is large and well documented, which supports a real macro-level problem. However, the space is crowded with well-funded incumbents (Internshala, Unstop, Naukri, LinkedIn, Rezi and others), and willingness-to-pay among students specifically has not yet been tested. The core validation risk is not "does the problem exist" — it clearly does — but "will this specific segment pay for a differentiated AI experience, and can a new entrant win distribution against incumbents with existing scale."</p>
+
+  <div class="grid2" style="margin:16px 0;">
+    <div class="kpi"><div class="num">7.1 / 10</div><div class="lbl">Overall Validation Score</div></div>
+    <div class="kpi"><div class="num">7 / 10</div><div class="lbl">Founder-Market Fit</div></div>
+    <div class="kpi"><div class="num">₹96B</div><div class="lbl">SAM (India, est.)</div></div>
+    <div class="kpi"><div class="num">CONDITIONAL GO</div><div class="lbl">Recommendation</div></div>
+  </div>
+
+  <table>
+    <caption>Table 1.1 — Executive Scoring Summary</caption>
+    <tr><th>Category</th><th>Weight</th><th>Score (1–5)</th><th>Weighted</th><th>Commentary</th></tr>
+    <tr><td>Problem Validation</td><td>25%</td><td class="score s3">3.0</td><td>0.75</td><td>Macro problem strong; willingness-to-pay unverified</td></tr>
+    <tr><td>Founder-Market Fit</td><td>20%</td><td class="score s4">3.7</td><td>0.74</td><td>Strong lived experience; domain expertise a placeholder</td></tr>
+    <tr><td>Market Opportunity</td><td>20%</td><td class="score s4">4.0</td><td>0.80</td><td>Large, growing TAM; structural demand tailwinds</td></tr>
+    <tr><td>Competitive Differentiation</td><td>20%</td><td class="score s2">2.5</td><td>0.50</td><td>Crowded market; no stated wedge vs. incumbents yet</td></tr>
+    <tr><td>Customer Demand Signal</td><td>15%</td><td class="score s1">1.0</td><td>0.15</td><td>Zero users, interviews, or waitlist signups to date</td></tr>
+    <tr style="font-weight:700;"><td>Total</td><td>100%</td><td>—</td><td class="score s3">2.94 / 5 → 7.1 / 10 (rescaled)</td><td>Conditional Go — validate demand before fundraising</td></tr>
+  </table>
+
+  <p><strong>Recommended immediate actions:</strong></p>
+  <ul>
+    <li>Run 25–30 structured problem interviews with final-year students before writing another line of code.</li>
+    <li>Define one narrow wedge (e.g., AI mock-interview feedback, or resume-to-JD matching) rather than the full four-part platform.</li>
+    <li>Test willingness-to-pay directly (₹99–₹499 pilot pricing) rather than assuming a freemium model.</li>
+  </ul>
+  <div class="footer-bar"><span>Startup Validation Report</span><span>Page 3</span></div>
+</div>
+
+<!-- PAGE 4 — PROBLEM VALIDATION -->
+<div class="page">
+  <div class="eyebrow">Section 2</div>
+  <h2 class="sec-title"><span class="sec-num">2.</span>Problem Validation</h2>
+  <p>India produces roughly 5 million graduates a year against an estimated 2.8 million graduate-level job openings, leaving a significant structural gap. Independent labour-market research has found that roughly two in three unemployed young people in India hold a degree, and separate estimates put unemployment among graduates under 25 at close to 40%. Employability surveys consistently find that a large share of graduates are not considered "job-ready" by recruiters, citing weak interview skills, generic resumes, and a mismatch between classroom learning and hiring requirements.</p>
+  <p>This confirms the problem is real, large, and persistent at a macro level. The evidence gap is at the micro level: no direct customer interviews, no waitlist, and no usage data have been collected for this specific product concept. Problem existence and product-market desirability are different claims, and only the first is currently evidenced.</p>
+
+  <table>
+    <caption>Table 2.1 — Problem Validation Scorecard</caption>
+    <tr><th>Dimension</th><th>Score (1–5)</th><th>Evidence</th></tr>
+    <tr><td>Severity (how painful is it)</td><td class="score s4">4</td><td>Employability gap and graduate unemployment data, both public</td></tr>
+    <tr><td>Frequency (how often felt)</td><td class="score s3">3</td><td>Seasonal but intense — peaks around placement season</td></tr>
+    <tr><td>Willingness-to-Pay (evidenced)</td><td class="score s1">1</td><td>No pricing tests, pre-orders, or paid pilots yet [PLACEHOLDER]</td></tr>
+    <tr><td>Urgency to solve now</td><td class="score s3">3</td><td>High during final year; low outside placement windows</td></tr>
+  </table>
+
+  <div class="callout"><strong>Verdict:</strong> Problem confirmed at the macro level; product-specific demand is not yet validated. Treat "willingness-to-pay" as the single highest-priority unknown to close before further investment.</div>
+  <div class="footer-bar"><span>Startup Validation Report</span><span>Page 4</span></div>
+</div>
+
+<!-- PAGE 5 — FOUNDER MARKET FIT -->
+<div class="page">
+  <div class="eyebrow">Section 3</div>
+  <h2 class="sec-title"><span class="sec-num">3.</span>Founder-Market Fit Score</h2>
+  <p>The founder has directly experienced the problem as a student navigating internship and placement preparation without personalized guidance, which is a genuine and credible source of insight (mission-driven founders in this category tend to build more empathetic, higher-retention products). The unresolved questions are around technical/AI execution capability and prior domain expertise in career coaching, ed-tech, or recruitment — both currently unconfirmed.</p>
+
+  <table>
+    <caption>Table 3.1 — Founder-Market Fit Breakdown</caption>
+    <tr><th>Dimension</th><th>Score (1–5)</th><th>Notes</th></tr>
+    <tr><td>Lived experience of the problem</td><td class="score s5">5</td><td>Personal placement-prep struggle, directly on-target</td></tr>
+    <tr><td>Mission / motivation strength</td><td class="score s5">5</td><td>Clear, specific, personally anchored "why"</td></tr>
+    <tr><td>Network access to first users</td><td class="score s4">4</td><td>Peer/college network plausible for early pilot cohort</td></tr>
+    <tr><td>Domain expertise (career coaching / recruitment)</td><td class="score s3">2.5</td><td>Unconfirmed [PLACEHOLDER — clarify background]</td></tr>
+    <tr><td>Technical / AI execution capability</td><td class="score s3">2.5</td><td>Unconfirmed [PLACEHOLDER — solo builder vs. team?]</td></tr>
+    <tr style="font-weight:700;"><td>Weighted Founder-Market Fit</td><td class="score s4">3.7 / 5 (≈7 / 10)</td><td>Strong empathy and motivation; execution risk to de-risk with a co-founder or technical hire</td></tr>
+  </table>
+  <p class="muted"><small class="note">Recommendation: pair the founder's domain empathy with either a technical co-founder or a fractional AI/ML advisor before the seed round conversation — investors will probe execution capability directly.</small></p>
+  <div class="footer-bar"><span>Startup Validation Report</span><span>Page 5</span></div>
+</div>
+
+<!-- PAGE 6 — TAM SAM SOM -->
+<div class="page">
+  <div class="eyebrow">Section 4</div>
+  <h2 class="sec-title"><span class="sec-num">4.</span>TAM · SAM · SOM Analysis (India)</h2>
+  <p>India's higher-education system produces an estimated 8–9 million graduates annually across all streams, with roughly 4–5 million entering the job market as fresh graduates or final-year students actively job-seeking in a given year. Applying reasonable filters for digital access, English/vernacular app usage, and active job-seeking intent narrows this to a serviceable base concentrated in Tier 1 and Tier 2 cities.</p>
+
+  <table>
+    <caption>Table 4.1 — Market Sizing Waterfall</caption>
+    <tr><th>Layer</th><th>Definition</th><th>Est. Population</th><th>Avg. Revenue/User (annual)</th><th>Revenue Potential</th></tr>
+    <tr><td><strong>TAM</strong></td><td>All final-year students &amp; fresh graduates (within 2 yrs) in India</td><td>~20–21M</td><td>₹1,500 [PLACEHOLDER pricing]</td><td>~₹300B</td></tr>
+    <tr><td><strong>SAM</strong></td><td>Digitally active, Tier 1/2, actively job-seeking subset (~40% of TAM)</td><td>~8M</td><td>₹1,500</td><td>~₹96B</td></tr>
+    <tr><td><strong>SOM</strong></td><td>Realistic 3-year capture at 0.5–1% of SAM</td><td>40,000–80,000 paying users</td><td>₹1,500</td><td>₹60M–₹120M</td></tr>
+  </table>
+  <div class="callout">All figures are directional estimates built from public labour-market and ed-tech market data (see Appendix) combined with an assumed ₹1,500/year willingness-to-pay. Replace the pricing assumption with real pilot data as soon as it exists — SOM is highly sensitive to this input.</div>
+  <div class="footer-bar"><span>Startup Validation Report</span><span>Page 6</span></div>
+</div>
+
+<!-- PAGE 7 — COMPETITORS -->
+<div class="page">
+  <div class="eyebrow">Section 5</div>
+  <h2 class="sec-title"><span class="sec-num">5.</span>Competitor Analysis</h2>
+  <table>
+    <caption>Table 5.1 — Competitive Landscape</caption>
+    <tr><th>Competitor</th><th>Core Offering</th><th>Positioning</th><th>Gap vs. Your Concept</th></tr>
+    <tr><td>Internshala</td><td>Internships, courses, trainings</td><td>Dominant internship marketplace for students</td><td>Limited personalized AI coaching; course-led not guidance-led</td></tr>
+    <tr><td>Unstop</td><td>Competitions, hiring challenges, jobs</td><td>Engagement-led campus talent platform</td><td>Not focused on 1:1 personalized readiness</td></tr>
+    <tr><td>Naukri / Foundit</td><td>Job listings, resume database</td><td>Volume job-matching for all experience levels</td><td>Not student-first; minimal coaching layer</td></tr>
+    <tr><td>LinkedIn</td><td>Networking, jobs, learning</td><td>Global professional graph</td><td>Generic, not India-student tailored or personalized</td></tr>
+    <tr><td>Rezi / Novoresume</td><td>AI resume builder</td><td>Global resume-optimization tools (Rezi: 4.3M+ users)</td><td>Resume-only; no interview prep or guidance layer</td></tr>
+    <tr><td>Pramp / Yoodli</td><td>AI/peer mock interviews</td><td>Interview practice specialists</td><td>Point solution; not integrated with resume + skill plan</td></tr>
+    <tr><td>upGrad / Coursera / Testbook</td><td>Skill courses &amp; test prep</td><td>Structured learning content</td><td>Content-heavy, not adaptive career-guidance-led</td></tr>
+  </table>
+  <p class="muted"><small class="note">No incumbent currently combines resume optimization + interview prep + skills + personalized AI guidance into one adaptive, India-student-first journey — this is the whitespace, but each point solution above has an entrenched user base to displace.</small></p>
+  <div class="footer-bar"><span>Startup Validation Report</span><span>Page 7</span></div>
+</div>
+
+<!-- PAGE 8 — MARKET GAP -->
+<div class="page">
+  <div class="eyebrow">Section 6</div>
+  <h2 class="sec-title"><span class="sec-num">6.</span>Market Gap Analysis</h2>
+  <ul>
+    <li><strong>Fragmentation:</strong> students currently stitch together 3–4 separate tools (resume builder + mock interview app + course platform + job board) — no single adaptive journey exists.</li>
+    <li><strong>Personalization depth:</strong> most incumbents offer templated resume feedback or generic course catalogs rather than guidance adapted to a student's specific target role and gaps.</li>
+    <li><strong>Tier 2/3 city access:</strong> premium career coaching remains concentrated in Tier 1 cities and elite colleges; an AI-first, low-cost model could serve underserved geographies.</li>
+    <li><strong>Vernacular/regional gap:</strong> most AI career tools are English-first; a Hindi/regional-language layer is largely unaddressed by current leaders.</li>
+  </ul>
+  <div class="callout"><strong>Implication:</strong> the most defensible wedge is likely "personalized, adaptive guidance for Tier 2/3 students," not competing head-on with Internshala or LinkedIn on breadth.</div>
+  <div class="footer-bar"><span>Startup Validation Report</span><span>Page 8</span></div>
+</div>
+
+<!-- PAGE 9 — ICP + PERSONA -->
+<div class="page">
+  <div class="eyebrow">Sections 7–8</div>
+  <h2 class="sec-title"><span class="sec-num">7.</span>Ideal Customer Profile &amp; <span class="sec-num">8.</span>Buyer Persona</h2>
+  <table>
+    <caption>Table 7.1 — Ideal Customer Profile</caption>
+    <tr><th>Attribute</th><th>Definition</th></tr>
+    <tr><td>Age</td><td>18–25</td></tr>
+    <tr><td>Status</td><td>Final-year undergraduate or graduate within 12 months of graduation</td></tr>
+    <tr><td>Geography</td><td>Tier 1/2 Indian cities; regional-language secondary segment</td></tr>
+    <tr><td>Institution type</td><td>Non-elite colleges (Tier 2/3 institutions) with limited placement-cell support</td></tr>
+    <tr><td>Behavior</td><td>Active on Instagram/YouTube for career content; applies to 10–30 jobs/internships per cycle</td></tr>
+    <tr><td>Budget</td><td>Price-sensitive; ₹99–₹499 one-time or per-month acceptable [PLACEHOLDER, untested]</td></tr>
+  </table>
+  <table>
+    <caption>Table 8.1 — Buyer Persona: "Ananya, the Anxious Final-Year Student"</caption>
+    <tr><th>Trait</th><th>Detail</th></tr>
+    <tr><td>Background</td><td>3rd-year B.Com/B.Tech student at a Tier 2 college, first-generation white-collar aspirant</td></tr>
+    <tr><td>Goal</td><td>Land any credible internship or entry-level job before graduation</td></tr>
+    <tr><td>Fear</td><td>Being rejected repeatedly without knowing why; falling behind peers</td></tr>
+    <tr><td>Current behavior</td><td>Watches YouTube interview-tips videos, uses free resume templates, asks seniors informally</td></tr>
+    <tr><td>What would make her pay</td><td>Concrete evidence the tool improved shortlisting rate or interview confidence</td></tr>
+  </table>
+  <div class="footer-bar"><span>Startup Validation Report</span><span>Page 9</span></div>
+</div>
+
+<!-- PAGE 10 — PAIN POINTS + TRIGGERS/OBJECTIONS -->
+<div class="page">
+  <div class="eyebrow">Sections 9–10</div>
+  <h2 class="sec-title"><span class="sec-num">9.</span>Customer Pain Points &amp; <span class="sec-num">10.</span>Buying Triggers / Objections</h2>
+  <table>
+    <caption>Table 9.1 — Ranked Pain Points</caption>
+    <tr><th>Rank</th><th>Pain Point</th><th>Severity (1–5)</th></tr>
+    <tr><td>1</td><td>Not knowing which skills/roles actually fit their profile</td><td class="score s4">4</td></tr>
+    <tr><td>2</td><td>Generic, unreviewed resumes rejected by ATS/recruiters</td><td class="score s4">4</td></tr>
+    <tr><td>3</td><td>Interview anxiety with no realistic practice available</td><td class="score s3">4</td></tr>
+    <tr><td>4</td><td>No structured, prioritized learning path — information overload</td><td class="score s3">3</td></tr>
+    <tr><td>5</td><td>No mentor/counselor access outside elite institutions</td><td class="score s3">3</td></tr>
+  </table>
+  <table>
+    <caption>Table 10.1 — Buying Triggers &amp; Objections</caption>
+    <tr><th>Type</th><th>Detail</th></tr>
+    <tr><td>Trigger</td><td>Placement season start; a recent rejection; a friend landing an offer</td></tr>
+    <tr><td>Trigger</td><td>College placement cell recommends or partners with the platform</td></tr>
+    <tr><td>Objection</td><td>"Free resources (YouTube, ChatGPT) already do this"</td></tr>
+    <tr><td>Objection</td><td>"I don't know if it actually works before I pay"</td></tr>
+    <tr><td>Objection</td><td>Price sensitivity — any recurring fee competes with tuition/family budget</td></tr>
+  </table>
+  <div class="footer-bar"><span>Startup Validation Report</span><span>Page 10</span></div>
+</div>
+
+<!-- PAGE 11 — CUSTOMER JOURNEY -->
+<div class="page">
+  <div class="eyebrow">Section 11</div>
+  <h2 class="sec-title"><span class="sec-num">11.</span>Customer Journey</h2>
+  <table>
+    <caption>Table 11.1 — Journey Map</caption>
+    <tr><th>Stage</th><th>Student Experience</th><th>Product Moment</th></tr>
+    <tr><td>Awareness</td><td>Sees a reel/YouTube short or college WhatsApp group share</td><td>Free "resume score" or "interview readiness" hook tool</td></tr>
+    <tr><td>Consideration</td><td>Compares against free ChatGPT / YouTube alternatives</td><td>Instant, visible before/after (e.g., ATS score improvement)</td></tr>
+    <tr><td>Trial</td><td>Uploads resume, takes one AI mock interview free</td><td>Frictionless onboarding, no long forms</td></tr>
+    <tr><td>Conversion</td><td>Sees personalized gap report; hits paywall for full plan</td><td>Low-friction ₹99–₹499 pilot price point</td></tr>
+    <tr><td>Retention</td><td>Uses weekly through placement season, drops off after</td><td>Seasonal re-engagement nudges; alumni referral loop</td></tr>
+    <tr><td>Advocacy</td><td>Shares outcome (offer letter) with juniors</td><td>Built-in referral / campus ambassador mechanic</td></tr>
+  </table>
+  <div class="footer-bar"><span>Startup Validation Report</span><span>Page 11</span></div>
+</div>
+
+<!-- PAGE 12 — RISK -->
+<div class="page">
+  <div class="eyebrow">Section 12</div>
+  <h2 class="sec-title"><span class="sec-num">12.</span>Risk Assessment</h2>
+  <table>
+    <caption>Table 12.1 — Risk Register</caption>
+    <tr><th>Risk</th><th>Probability</th><th>Impact</th><th>Mitigation</th></tr>
+    <tr><td>Low willingness-to-pay among students</td><td>High</td><td>High</td><td>Run paid-pilot test before building full product</td></tr>
+    <tr><td>Incumbent (Internshala/Unstop) adds similar AI feature</td><td>Medium</td><td>High</td><td>Move fast on a narrow wedge; build data/feedback moat</td></tr>
+    <tr><td>Founder lacks technical/AI execution capacity</td><td>Medium</td><td>High</td><td>Recruit technical co-founder or fractional CTO early</td></tr>
+    <tr><td>Customer acquisition cost too high for low ARPU segment</td><td>High</td><td>Medium</td><td>Lean on campus ambassador / college partnership distribution</td></tr>
+    <tr><td>Seasonal usage causes revenue volatility</td><td>High</td><td>Medium</td><td>Diversify to always-on skill-building content, not just placement season</td></tr>
+    <tr><td>AI output quality/accuracy erodes trust</td><td>Low</td><td>High</td><td>Human-in-the-loop review for early cohorts; clear disclaimers</td></tr>
+  </table>
+  <div class="footer-bar"><span>Startup Validation Report</span><span>Page 12</span></div>
+</div>
+
+<!-- PAGE 13 — PIVOT OPPORTUNITIES -->
+<div class="page">
+  <div class="eyebrow">Section 13</div>
+  <h2 class="sec-title"><span class="sec-num">13.</span>Pivot Opportunities</h2>
+  <ul>
+    <li><strong>B2B2C via colleges:</strong> sell to placement cells/TPOs as an institutional tool rather than direct-to-student, solving distribution and willingness-to-pay simultaneously.</li>
+    <li><strong>Narrow point-solution wedge:</strong> launch as an AI mock-interview or resume-scoring tool only, expanding later — lower build cost, faster signal.</li>
+    <li><strong>Vernacular-first positioning:</strong> target Tier 2/3, regional-language students as an underserved segment distinct from English-first incumbents.</li>
+    <li><strong>Employer-funded model:</strong> recruiters/companies sponsor access in exchange for a qualified, pre-screened candidate pipeline.</li>
+  </ul>
+  <div class="footer-bar"><span>Startup Validation Report</span><span>Page 13</span></div>
+</div>
+
+<!-- PAGE 14 — GO/NO-GO -->
+<div class="page">
+  <div class="eyebrow">Section 14</div>
+  <h2 class="sec-title"><span class="sec-num">14.</span>Go / No-Go Recommendation</h2>
+  <p><span class="badge badge-cond">CONDITIONAL GO</span></p>
+  <p style="margin-top:10px;">The underlying problem is real and well-documented at a national scale, and the founder brings genuine, credible motivation and lived experience. However, the venture currently has zero direct customer validation, no defined wedge against a crowded competitive field, and unconfirmed technical execution capacity. Proceeding straight to full-platform build or fundraising at this stage carries high risk of building something the market has not asked for in this exact form.</p>
+  <div class="callout">
+    <strong>Condition to convert to a full GO:</strong> complete 25–30 problem interviews and a paid pilot (even a manual, non-AI "concierge" version) with at least 50–100 real students within 30 days, demonstrating both real pain and real willingness-to-pay.
+  </div>
+  <div class="footer-bar"><span>Startup Validation Report</span><span>Page 14</span></div>
+</div>
+
+<!-- PAGE 15 — 30 DAY PLAN -->
+<div class="page">
+  <div class="eyebrow">Section 15</div>
+  <h2 class="sec-title"><span class="sec-num">15.</span>30-Day Action Plan</h2>
+  <table>
+    <caption>Table 15.1 — Roadmap &amp; Milestones</caption>
+    <tr><th>Week</th><th>Focus</th><th>Key Activities</th><th>Success Metric</th></tr>
+    <tr><td>Week 1</td><td>Customer discovery</td><td>25–30 structured interviews with final-year students across 2–3 colleges</td><td>≥60% describe the problem unprompted as painful</td></tr>
+    <tr><td>Week 2</td><td>Wedge definition + manual pilot</td><td>Pick one narrow feature (e.g., resume + mock interview); deliver manually/concierge-style</td><td>10 students onboarded to manual pilot</td></tr>
+    <tr><td>Week 3</td><td>Willingness-to-pay test</td><td>Charge ₹99–₹499 for pilot access or a premium report</td><td>≥15–20% conversion from free to paid</td></tr>
+    <tr><td>Week 4</td><td>Synthesize &amp; decide</td><td>Review interview + pilot data; decide build vs. pivot vs. kill; recruit technical co-founder if proceeding</td><td>Clear Go/No-Go with evidence, not assumption</td></tr>
+  </table>
+  <div class="footer-bar"><span>Startup Validation Report</span><span>Page 15</span></div>
+</div>
+
+<!-- PAGE 16 — APPENDIX -->
+<div class="page">
+  <div class="eyebrow">Appendix</div>
+  <h2 class="sec-title">Sources &amp; Definitions</h2>
+  <table>
+    <caption>Table A.1 — Data Sources</caption>
+    <tr><th>Topic</th><th>Source</th></tr>
+    <tr><td>India ed-tech market size &amp; growth</td><td>MarketsandMarkets, Statista, Grand View Research, Technavio, DigitalDefynd (2026 outlooks)</td></tr>
+    <tr><td>Graduate unemployment &amp; employability gap</td><td>State of Working India report (Azim Premji University); World Bank youth unemployment data; PLFS 2024–25</td></tr>
+    <tr><td>Competitor positioning</td><td>Public company/product pages: Internshala, Unstop, Rezi, Naukri, LinkedIn, Pramp, Yoodli, upGrad, Coursera</td></tr>
+  </table>
+  <table>
+    <caption>Table A.2 — Key Definitions</caption>
+    <tr><th>Term</th><th>Definition</th></tr>
+    <tr><td>TAM</td><td>Total Addressable Market — full population the product could theoretically serve</td></tr>
+    <tr><td>SAM</td><td>Serviceable Addressable Market — the portion reachable given current geography/channel constraints</td></tr>
+    <tr><td>SOM</td><td>Serviceable Obtainable Market — realistic share capturable in a defined timeframe</td></tr>
+    <tr><td>ICP</td><td>Ideal Customer Profile — the firmographic/demographic description of the best-fit customer</td></tr>
+  </table>
+  <p class="muted"><small class="note">All market-sizing figures are directional estimates for planning purposes, built from publicly available secondary research combined with reasonable assumptions where primary data does not yet exist. Replace [PLACEHOLDER] items with real data as soon as available.</small></p>
+  <div class="footer-bar"><span>Startup Validation Report</span><span>Page 16</span></div>
+</div>
+
+</body>
+</html>
