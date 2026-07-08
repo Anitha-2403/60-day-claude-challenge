@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Customer & MVP Blueprint — AI Career Readiness Platform</title>
+<style>
+  :root{
+    --navy:#0f2b46; --navy-2:#173d61; --gold:#b8862f; --gold-light:#e8c887;
+    --paper:#fbfaf7; --ink:#1c2530; --muted:#5b6672; --line:#d7dce1;
+    --green:#3f7d5c; --amber:#b8862f; --red:#a8433a;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:#e9ebee; color:var(--ink); font-family:"Georgia","Times New Roman",serif; font-size:14.5px; line-height:1.5; }
+  .page{ width:210mm; min-height:297mm; margin:14px auto; padding:18mm 17mm; background:var(--paper); position:relative; box-shadow:0 0 0 1px #cfd4da, 0 6px 18px rgba(0,0,0,.12); }
+  @media print{ body{background:#fff;} .page{width:auto; min-height:auto; margin:0; box-shadow:none; padding:14mm 15mm; page-break-after:always;} }
+  h1,h2,h3{ font-family:"Georgia","Times New Roman",serif; color:var(--navy); margin:0 0 6px; }
+  .eyebrow{ font-family:Arial,Helvetica,sans-serif; letter-spacing:.14em; text-transform:uppercase; font-size:10px; color:var(--gold); font-weight:700; margin-bottom:6px; }
+  .sec-title{ font-size:19px; border-bottom:2px solid var(--navy); padding-bottom:7px; margin-bottom:12px; }
+  .sec-num{ color:var(--gold); font-weight:700; margin-right:7px; }
+  p{margin:0 0 9px;}
+  .muted{color:var(--muted);}
+  small.note{color:var(--muted); font-family:Arial,Helvetica,sans-serif; font-size:11px;}
+  ul{margin:6px 0 12px 20px; padding:0;}
+  li{margin-bottom:4px;}
+  table{width:100%; border-collapse:collapse; margin:8px 0 14px; font-family:Arial,Helvetica,sans-serif; font-size:12px;}
+  caption{ text-align:left; font-family:Arial,Helvetica,sans-serif; font-weight:700; color:var(--navy); font-size:11.5px; margin-bottom:5px; text-transform:uppercase; letter-spacing:.04em;}
+  th{ background:var(--navy); color:#fff; text-align:left; padding:6px 8px; font-weight:600;}
+  td{ padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top;}
+  tr:nth-child(even) td{background:#f2f2ee;}
+  .score{ font-weight:700; }
+  .s5{color:var(--green);} .s4{color:var(--green);} .s3{color:var(--amber);} .s2{color:var(--red);} .s1{color:var(--red);}
+  .badge{ display:inline-block; padding:2px 9px; border-radius:3px; font-family:Arial,sans-serif; font-size:11px; font-weight:700; }
+  .badge-go{ background:#e5f0ea; color:var(--green); }
+  .badge-cond{ background:#fbf1de; color:var(--amber); }
+  .badge-weak{ background:#fbe8db; color:#a8622b; }
+  .badge-no{ background:#f7e6e4; color:var(--red); }
+  .callout{ border-left:4px solid var(--gold); background:#faf6ec; padding:9px 12px; margin:12px 0; font-size:12.5px;}
+  .grid2{ display:flex; gap:14px; } .grid2 > div{ flex:1; }
+  .grid4{ display:flex; gap:10px; margin:12px 0; }
+  .kpi{ border:1px solid var(--line); padding:10px 10px; text-align:center; flex:1; }
+  .kpi .num{ font-size:20px; font-weight:700; color:var(--navy); font-family:Arial,sans-serif;}
+  .kpi .lbl{ font-family:Arial,sans-serif; font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em;}
+  .moscow{ display:flex; gap:10px; }
+  .moscow .col{ flex:1; border:1px solid var(--line); padding:8px 10px; }
+  .moscow h4{ font-family:Arial,sans-serif; font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; margin:0 0 6px; padding-bottom:4px; border-bottom:1px solid var(--line);}
+  .moscow ul{ margin:0; padding-left:16px; font-size:12px; }
+  .moscow li{ margin-bottom:5px; }
+  .must h4{color:#2e6b46;} .should h4{color:#1f5a8a;} .could h4{color:var(--amber);} .wont h4{color:var(--red);}
+  .footer-bar{ position:absolute; bottom:9mm; left:17mm; right:17mm; display:flex; justify-content:space-between; font-family:Arial,sans-serif; font-size:9px; color:var(--muted); border-top:1px solid var(--line); padding-top:5px;}
+  .titlepage{ height:100%; display:flex; flex-direction:column; justify-content:space-between; }
+  .titlepage .mark{ font-family:Arial,sans-serif; letter-spacing:.25em; text-transform:uppercase; color:var(--gold); font-size:12px; font-weight:700;}
+  .titlepage h1{ font-size:38px; line-height:1.15; max-width:82%; margin-top:36px;}
+  .titlepage .sub{ font-size:16px; color:var(--muted); max-width:72%; margin-top:10px;}
+  .titlepage .confid{ font-family:Arial,sans-serif; font-size:11px; color:var(--muted); border:1px solid var(--line); display:inline-block; padding:5px 10px;}
+  .rule{ height:3px; background:linear-gradient(90deg,var(--navy),var(--gold)); margin:16px 0; }
+  .print-btn{ position:fixed; top:16px; right:16px; z-index:99; font-family:Arial,sans-serif; background:var(--navy); color:#fff; border:none; padding:10px 16px; border-radius:4px; cursor:pointer; font-size:13px; box-shadow:0 3px 10px rgba(0,0,0,.25);}
+  @media print{ .print-btn{display:none;} }
+  .verdict-box{ border:2px solid var(--amber); background:#fbf3e3; padding:16px 18px; margin-top:14px; }
+  .verdict-box .vtitle{ font-family:Arial,sans-serif; font-size:22px; font-weight:800; color:#a8622b; }
+</style>
+</head>
+<body>
+<button class="print-btn" onclick="window.print()">Export / Print to PDF</button>
+
+<!-- PAGE 1 — TITLE -->
+<div class="page">
+  <div class="titlepage">
+    <div>
+      <div class="mark">Customer &amp; MVP Blueprint</div>
+      <div class="rule"></div>
+    </div>
+    <div>
+      <h1>From Validated Problem to Buildable MVP — AI Career Readiness Platform</h1>
+      <div class="sub">A customer-research-driven blueprint translating the prior Startup Validation Report into an ICP, persona, MVP scope, pricing hypothesis, and 30-day build plan.</div>
+      <p style="margin-top:26px; font-family:Arial,sans-serif; font-size:12px; color:var(--muted);">
+        Source document: <strong>Startup Validation Report — AI Career Guidance Platform (07 July 2026)</strong><br>
+        Market focus: <strong>India</strong> — final-year students &amp; fresh graduates (18–25)<br>
+        Prepared for: <strong>Founder / Early-Stage Team</strong><br>
+        Date: <strong>08 July 2026</strong>
+      </p>
+    </div>
+    <div>
+      <span class="confid">CONFIDENTIAL — FOUNDER WORKING DOCUMENT</span>
+      <div class="footer-bar" style="position:static; border:none; margin-top:16px;">
+        <span>Customer &amp; MVP Blueprint</span><span>Page 1</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2 — EXEC SUMMARY + ICP + PERSONA -->
+<div class="page">
+  <div class="eyebrow">Section 1</div>
+  <h2 class="sec-title"><span class="sec-num">1.</span>Executive Summary</h2>
+  <p>This blueprint builds directly on the prior Startup Validation Report for an AI-powered platform helping Indian students and fresh graduates with resumes, interview prep, skills, and career guidance. That report confirmed a large, well-documented macro problem (India's graduate employability gap) and genuine founder-market fit, but flagged zero direct customer validation and a crowded competitive field (Internshala, Unstop, Naukri, LinkedIn, Rezi) as the key open risks.</p>
+  <p>This document translates those findings into an actionable customer profile, a narrowed MVP scope, and a 30-day plan to close the validation gap before further build investment.</p>
+  <div class="grid4">
+    <div class="kpi"><div class="num">70</div><div class="lbl">Customer Clarity</div></div>
+    <div class="kpi"><div class="num">80</div><div class="lbl">Problem Severity</div></div>
+    <div class="kpi"><div class="num">55</div><div class="lbl">PMF Potential</div></div>
+    <div class="kpi"><div class="num">50</div><div class="lbl">MVP Readiness</div></div>
+  </div>
+
+  <div class="eyebrow" style="margin-top:6px;">Section 2</div>
+  <h2 class="sec-title" style="font-size:17px;"><span class="sec-num">2.</span>Ideal Customer Profile</h2>
+  <table>
+    <caption>Table 2.1 — ICP</caption>
+    <tr><th>Attribute</th><th>Definition</th></tr>
+    <tr><td>Age</td><td>18–25</td></tr>
+    <tr><td>Status</td><td>Final-year undergraduate, or graduate within 12 months</td></tr>
+    <tr><td>Geography</td><td>Tier 1/2 Indian cities; regional-language secondary segment</td></tr>
+    <tr><td>Institution</td><td>Non-elite Tier 2/3 colleges with limited placement-cell support</td></tr>
+    <tr><td>Behavior</td><td>Active on Instagram/YouTube for career content; applies to 10–30 jobs/internships per cycle</td></tr>
+    <tr><td>Budget</td><td>Price-sensitive; ₹99–₹499 one-time or per-month plausible [PLACEHOLDER, untested]</td></tr>
+  </table>
+
+  <div class="eyebrow">Section 3</div>
+  <h2 class="sec-title" style="font-size:17px;"><span class="sec-num">3.</span>Buyer Persona — "Ananya, the Anxious Final-Year Student"</h2>
+  <table>
+    <caption>Table 3.1 — Persona Snapshot</caption>
+    <tr><th>Trait</th><th>Detail</th></tr>
+    <tr><td>Background</td><td>3rd-year B.Com/B.Tech student, Tier 2 college; first-generation white-collar aspirant</td></tr>
+    <tr><td>Goal</td><td>Land any credible internship or entry-level job before graduation</td></tr>
+    <tr><td>Fear</td><td>Being rejected repeatedly without knowing why; falling behind peers</td></tr>
+    <tr><td>Current behavior</td><td>Watches YouTube interview-tips videos, uses free resume templates, asks seniors informally</td></tr>
+    <tr><td>What makes her pay</td><td>Concrete evidence the tool improves shortlisting rate or interview confidence</td></tr>
+  </table>
+  <div class="footer-bar"><span>Customer &amp; MVP Blueprint</span><span>Page 2</span></div>
+</div>
+
+<!-- PAGE 3 — PAIN POINTS + JOURNEY -->
+<div class="page">
+  <div class="eyebrow">Section 4</div>
+  <h2 class="sec-title"><span class="sec-num">4.</span>Top 10 Customer Pain Points</h2>
+  <table>
+    <caption>Table 4.1 — Ranked Pain Points</caption>
+    <tr><th>Rank</th><th>Pain Point</th><th>Severity (1–5)</th></tr>
+    <tr><td>1</td><td>Doesn't know which skills/roles actually fit their profile</td><td class="score s4">4</td></tr>
+    <tr><td>2</td><td>Generic, unreviewed resumes get filtered out by ATS/recruiters</td><td class="score s4">4</td></tr>
+    <tr><td>3</td><td>Interview anxiety with no realistic, low-stakes practice available</td><td class="score s4">4</td></tr>
+    <tr><td>4</td><td>No structured, prioritized learning path — information overload from free content</td><td class="score s3">3</td></tr>
+    <tr><td>5</td><td>No mentor/counselor access outside elite institutions</td><td class="score s3">3</td></tr>
+    <tr><td>6</td><td>Conflicting, contradictory career advice from YouTube/social media</td><td class="score s3">3</td></tr>
+    <tr><td>7</td><td>Struggles to articulate projects/achievements with confidence</td><td class="score s3">3</td></tr>
+    <tr><td>8</td><td>No feedback loop after application rejections — doesn't know what went wrong</td><td class="score s3">3</td></tr>
+    <tr><td>9</td><td>College placement cell has limited bandwidth per student</td><td class="score s3">3</td></tr>
+    <tr><td>10</td><td>Family budget constraints limit access to paid human coaching</td><td class="score s2">2</td></tr>
+  </table>
+
+  <h2 class="sec-title"><span class="sec-num">5.</span>Customer Journey</h2>
+  <table>
+    <caption>Table 5.1 — Awareness → Consideration → Purchase → Retention</caption>
+    <tr><th>Stage</th><th>Student Experience</th><th>Product Moment</th></tr>
+    <tr><td>Awareness</td><td>Sees a reel/YouTube short or a college WhatsApp group share</td><td>Free "resume score" or "interview readiness" hook tool</td></tr>
+    <tr><td>Consideration</td><td>Compares against free ChatGPT/YouTube alternatives; checks reviews</td><td>Instant, visible before/after (e.g., ATS score jump)</td></tr>
+    <tr><td>Purchase</td><td>Uploads resume, takes one free AI mock interview, hits a paywall for the full gap report</td><td>Low-friction ₹99–₹499 pilot price point; frictionless checkout</td></tr>
+    <tr><td>Retention</td><td>Uses weekly through placement season, drops off after landing an offer</td><td>Seasonal re-engagement nudges; alumni referral loop for juniors</td></tr>
+  </table>
+  <div class="footer-bar"><span>Customer &amp; MVP Blueprint</span><span>Page 3</span></div>
+</div>
+
+<!-- PAGE 4 — OBJECTIONS + TRIGGERS -->
+<div class="page">
+  <div class="eyebrow">Section 6</div>
+  <h2 class="sec-title"><span class="sec-num">6.</span>Key Customer Objections</h2>
+  <ul>
+    <li><strong>"Free resources already do this."</strong> YouTube, ChatGPT, and senior advice are seen as free substitutes.</li>
+    <li><strong>"I don't know if it actually works before I pay."</strong> No visible proof of outcome (offers, shortlists) yet.</li>
+    <li><strong>Price sensitivity.</strong> Any recurring fee competes directly with tuition or family budget.</li>
+    <li><strong>"AI advice feels generic."</strong> Fear that automated guidance won't understand their specific background.</li>
+    <li><strong>Course fatigue / sunk-cost skepticism.</strong> Past paid courses that didn't lead to outcomes make them wary of a new paid tool.</li>
+  </ul>
+
+  <h2 class="sec-title"><span class="sec-num">7.</span>Key Buying Triggers</h2>
+  <ul>
+    <li>Placement season begins (roughly August–March) and campus drives are announced.</li>
+    <li>A recent rejection, or a friend/peer landing an offer.</li>
+    <li>College placement cell recommends or partners with the platform.</li>
+    <li>Viral social content about resumes being auto-rejected by ATS systems.</li>
+    <li>An interview is scheduled in the next few days, creating urgent, high-intent demand.</li>
+  </ul>
+
+  <div class="callout"><strong>Reading the pattern:</strong> objections cluster around trust and price; triggers cluster around urgency and social proof. The MVP should lead with a free, instant, visible proof-point (Section 8) before ever asking for payment.</div>
+  <div class="footer-bar"><span>Customer &amp; MVP Blueprint</span><span>Page 4</span></div>
+</div>
+
+<!-- PAGE 5 — MVP RECOMMENDATION + MOSCOW -->
+<div class="page">
+  <div class="eyebrow">Section 8</div>
+  <h2 class="sec-title"><span class="sec-num">8.</span>MVP Recommendation</h2>
+  <table>
+    <caption>Table 8.1 — Build Scope Decision</caption>
+    <tr><th>Question</th><th>Answer</th></tr>
+    <tr><td>What should be built first?</td><td>A single narrow wedge: an AI resume scorer (ATS + recruiter-readability check) paired with one AI mock-interview flow. Deliver manually/concierge-style for the first 10 users if full automation isn't ready.</td></tr>
+    <tr><td>What should NOT be built (yet)?</td><td>The full 4-in-1 platform, a skills-course library, native mobile apps, gamified community features, vernacular-language support, or a job-board integration. These add build cost without yet-proven demand.</td></tr>
+    <tr><td>Success metrics</td><td>≥60% of discovery interviewees describe the problem as painful unprompted; 10 students complete the manual pilot; ≥15–20% convert from free to a paid report; at least 1 college placement cell engages in a partnership conversation.</td></tr>
+  </table>
+
+  <h2 class="sec-title"><span class="sec-num">9.</span>MoSCoW Prioritization</h2>
+  <div class="moscow">
+    <div class="col must">
+      <h4>Must Have</h4>
+      <ul><li>AI resume scorer (ATS + feedback)</li><li>1 AI mock-interview flow</li><li>₹ pricing test (paid report/unlock)</li></ul>
+    </div>
+    <div class="col should">
+      <h4>Should Have</h4>
+      <ul><li>Personalized skill-gap report</li><li>Basic progress dashboard</li></ul>
+    </div>
+    <div class="col could">
+      <h4>Could Have</h4>
+      <ul><li>Vernacular language support</li><li>College/T&amp;P partnership portal</li></ul>
+    </div>
+    <div class="col wont">
+      <h4>Won't Have (MVP)</h4>
+      <ul><li>Full course/skill library</li><li>Native mobile apps</li><li>Gamified community/forum</li><li>Job-board integration</li></ul>
+    </div>
+  </div>
+  <div class="footer-bar"><span>Customer &amp; MVP Blueprint</span><span>Page 5</span></div>
+</div>
+
+<!-- PAGE 6 — PRICING + RISKS -->
+<div class="page">
+  <div class="eyebrow">Section 10</div>
+  <h2 class="sec-title"><span class="sec-num">10.</span>Pricing Hypothesis</h2>
+  <p>Test a low-friction, one-time "Career Readiness Report" priced at <strong>₹99–₹499</strong> (resume score + gap analysis + one mock-interview transcript review) rather than a recurring subscription, since Section 6's objections show recurring fees compete directly with tuition budgets. Use this pilot price point purely to measure willingness-to-pay; a freemium + B2B2C (college licensing) model is the likely long-term structure once demand is confirmed. All figures are [PLACEHOLDER] pending real pilot data.</p>
+
+  <h2 class="sec-title"><span class="sec-num">11.</span>Top 5 Risks</h2>
+  <table>
+    <caption>Table 11.1 — Condensed Risk Register</caption>
+    <tr><th>#</th><th>Risk</th><th>Mitigation</th></tr>
+    <tr><td>1</td><td>Low willingness-to-pay among students</td><td>Run the paid-pilot test in Section 10 before building further</td></tr>
+    <tr><td>2</td><td>Incumbent (Internshala/Unstop) adds a similar AI feature</td><td>Move fast on the narrow wedge; build a data/feedback moat</td></tr>
+    <tr><td>3</td><td>Founder lacks confirmed technical/AI execution capacity</td><td>Recruit a technical co-founder or fractional CTO early</td></tr>
+    <tr><td>4</td><td>High customer acquisition cost vs. low ARPU</td><td>Lean on campus-ambassador and college-partnership distribution</td></tr>
+    <tr><td>5</td><td>Seasonal usage causes revenue volatility</td><td>Diversify toward always-on skill content beyond placement season</td></tr>
+  </table>
+  <div class="footer-bar"><span>Customer &amp; MVP Blueprint</span><span>Page 6</span></div>
+</div>
+
+<!-- PAGE 7 — 30 DAY PLAN + ACTION SHEET -->
+<div class="page">
+  <div class="eyebrow">Section 12</div>
+  <h2 class="sec-title"><span class="sec-num">12.</span>30-Day MVP Plan</h2>
+  <table>
+    <caption>Table 12.1 — Roadmap &amp; Milestones</caption>
+    <tr><th>Week</th><th>Focus</th><th>Key Activities</th><th>Success Metric</th></tr>
+    <tr><td>Week 1</td><td>Customer discovery</td><td>25–30 structured interviews with final-year students across 2–3 colleges</td><td>≥60% describe the problem unprompted as painful</td></tr>
+    <tr><td>Week 2</td><td>Wedge + manual pilot</td><td>Pick resume scorer + mock interview; deliver manually/concierge-style</td><td>10 students onboarded to the manual pilot</td></tr>
+    <tr><td>Week 3</td><td>Willingness-to-pay test</td><td>Charge ₹99–₹499 for pilot access or a premium report</td><td>≥15–20% conversion from free to paid</td></tr>
+    <tr><td>Week 4</td><td>Synthesize &amp; decide</td><td>Review interview + pilot data; decide build vs. pivot vs. kill</td><td>Clear Go/No-Go decision with evidence, not assumption</td></tr>
+  </table>
+
+  <h2 class="sec-title"><span class="sec-num">13.</span>Founder Action Sheet — Top 10 Next Actions</h2>
+  <ul>
+    <li>Draft an interview script targeting problem severity and willingness-to-pay.</li>
+    <li>Recruit 25–30 final-year students for interviews across 2–3 colleges.</li>
+    <li>Build a simple landing page around the free "resume score" hook.</li>
+    <li>Set up a waitlist form and basic signup tracking.</li>
+    <li>Manually deliver a concierge resume review + mock interview to the first 10 users.</li>
+    <li>Test ₹99–₹499 paid-pilot pricing with early adopters.</li>
+    <li>Reach out to 2–3 college placement cells for informal partnership conversations.</li>
+    <li>Resolve founder-fit gaps — begin a co-founder/advisor search for technical or domain expertise.</li>
+    <li>Track qualitative and quantitative signals against the Go/No-Go thresholds above.</li>
+    <li>Compile Week 4 findings into a written build/pivot/kill decision memo.</li>
+  </ul>
+  <div class="footer-bar"><span>Customer &amp; MVP Blueprint</span><span>Page 7</span></div>
+</div>
+
+<!-- PAGE 8 — SCORES + VERDICT -->
+<div class="page">
+  <div class="eyebrow">Section 14</div>
+  <h2 class="sec-title"><span class="sec-num">14.</span>Scores (0–100)</h2>
+  <table>
+    <caption>Table 14.1 — Scoring Summary</caption>
+    <tr><th>Dimension</th><th>Score</th><th>Rationale</th></tr>
+    <tr><td>Customer Clarity</td><td class="score s3">70</td><td>ICP and persona are well-defined from secondary research, but not yet confirmed via primary interviews</td></tr>
+    <tr><td>Problem Severity</td><td class="score s4">80</td><td>Backed by strong, independently sourced macro employability data</td></tr>
+    <tr><td>PMF Potential</td><td class="score s3">55</td><td>Large addressable market, but crowded competition and zero product-specific demand signal to date</td></tr>
+    <tr><td>MVP Readiness</td><td class="score s3">50</td><td>Wedge is conceptually clear and buildable, but technical execution capacity and pricing are unconfirmed</td></tr>
+  </table>
+
+  <h2 class="sec-title"><span class="sec-num">15.</span>Final Verdict</h2>
+  <div class="verdict-box">
+    <span class="vtitle">🟡 Promising but Unvalidated</span>
+    <p style="margin-top:10px;">The underlying problem is real, large, and well-evidenced, and the founder brings genuine motivation and lived experience. But with zero direct customer interviews, no waitlist, and no paid pilot completed, this remains an unvalidated hypothesis rather than a confirmed opportunity. The 30-day plan above is the fastest, lowest-cost path to converting this from <em>promising</em> to either a <strong>confirmed Go</strong> or an early, low-cost <strong>kill/pivot</strong> decision.</p>
+  </div>
+  <p class="muted" style="margin-top:14px;"><small class="note">This blueprint was derived from the Startup Validation Report dated 07 July 2026. Replace all [PLACEHOLDER] figures with real interview, pilot, and pricing data as they become available.</small></p>
+  <div class="footer-bar"><span>Customer &amp; MVP Blueprint</span><span>Page 8</span></div>
+</div>
+
+</body>
+</html>
