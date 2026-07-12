@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prior Authorization Story Simulator</title>
+
+<!-- Tailwind CSS via CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          ink:      '#10202B',   // primary text — near-black navy
+          canvas:   '#F5F8FA',   // page background
+          surface:  '#FFFFFF',   // card / feed background
+          rahul:    '#2563A6',   // Rahul's bubble blue
+          rahulbg:  '#EAF2FA',
+          priya:    '#0E7C7B',   // Priya's bubble teal
+          priyabg:  '#E7F5F3',
+          line:     '#DCE6EC',
+          warn:     '#B4530F',
+          warnbg:   '#FDF1E8',
+          good:     '#1B7A43',
+          goodbg:   '#E9F7EE',
+        },
+        fontFamily: {
+          sans: ['-apple-system','Segoe UI','Helvetica Neue','Arial','sans-serif'],
+          serif: ['Georgia','Cambria','Times New Roman','serif'],
+        }
+      }
+    }
+  }
+</script>
+
+<style>
+  /* Only the minimal custom CSS Tailwind utilities can't express cleanly */
+  body { background-color: #F5F8FA; }
+
+  .bubble-tail-left::before {
+    content: "";
+    position: absolute;
+    left: -6px;
+    top: 14px;
+    width: 12px;
+    height: 12px;
+    background: inherit;
+    transform: rotate(45deg);
+    border-radius: 2px;
+  }
+  .bubble-tail-right::before {
+    content: "";
+    position: absolute;
+    right: -6px;
+    top: 14px;
+    width: 12px;
+    height: 12px;
+    background: inherit;
+    transform: rotate(45deg);
+    border-radius: 2px;
+  }
+
+  .fade-in { animation: fadeIn .35s ease both; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  #chatFeed::-webkit-scrollbar { width: 8px; }
+  #chatFeed::-webkit-scrollbar-thumb { background: #CBD9E1; border-radius: 8px; }
+
+  .choice-btn:disabled { opacity: .45; cursor: not-allowed; }
+</style>
+</head>
+
+<body class="min-h-screen font-sans text-ink">
+
+  <!-- ============================================================
+       HEADER: title + 8-segment progress bar
+  ============================================================= -->
+  <header class="sticky top-0 z-20 bg-surface/95 backdrop-blur border-b border-line">
+    <div class="max-w-3xl mx-auto px-5 py-4">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <h1 class="text-lg md:text-xl font-bold tracking-tight">Prior Authorization Story Simulator</h1>
+          <p class="text-xs text-slate-500 mt-0.5">A beginner-friendly walk-through of how Prior Authorization works</p>
+        </div>
+        <span id="sceneLabel" class="hidden sm:inline-block text-xs font-semibold text-priya bg-priyabg px-3 py-1 rounded-full whitespace-nowrap">
+          Scene 1 of 8
+        </span>
+      </div>
+
+      <!-- progress bar -->
+      <div id="progressBar" class="flex gap-1.5"><!-- 8 segments injected by JS --></div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       MAIN: chat feed + choice / continue controls
+  ============================================================= -->
+  <main class="max-w-3xl mx-auto px-5 py-6">
+
+    <div id="chatFeed"
+         class="bg-surface border border-line rounded-2xl shadow-sm p-4 md:p-6 flex flex-col gap-4 min-h-[420px]">
+      <!-- Chat bubbles / narration are appended here via createElement + appendChild.
+           This container's innerHTML is never reassigned. -->
+    </div>
+
+    <!-- choice buttons appear here after each scene's dialogue -->
+    <div id="choiceArea" class="mt-4 grid sm:grid-cols-2 gap-3"></div>
+
+    <!-- continue / restart button appears here -->
+    <div id="continueArea" class="mt-4 flex justify-center"></div>
+
+  </main>
+
+  <footer class="max-w-3xl mx-auto px-5 pb-8 pt-2 text-center text-xs text-slate-400">
+    Educational story simulation. "StarCare Health" is a fictional, illustrative example payer created for this simulation only.
+  </footer>
+
+<script>
+/* ================================================================
+   CHARACTER CONFIG
+   Rahul (patient) renders left in a blue bubble.
+   Priya (ops specialist) renders right in a teal bubble.
+   Narrator + Doctor render as centered italic text — never bubbles.
+
+   SPEAKER_SIDE is the single source of truth for which "side" a
+   given speaker key belongs to. Every dialogue / extraLines object
+   in STORY is normalized against this map at load time (see
+   normalizeLine / validateAndNormalizeStory below), so every line
+   that reaches the renderer is guaranteed to carry a valid `side`
+   property ("left" | "right" | "center") and no lookup ever
+   silently returns undefined.
+================================================================ */
+const CHARACTERS = {
+  rahul: { name: "Rahul", emoji: "👦", side: "left" },
+  priya: { name: "Priya", emoji: "👧", side: "right" }
+};
+
+const SPEAKER_SIDE = {
+  rahul:  "left",
+  priya:  "right",
+  doctor: "center",
+  narrator: "center"
+};
+
+/* ================================================================
+   STORY DATA — 8 scenes.
+   Each scene:
+     title        : shown in the scene label / progress
+     narration    : array of centered italic lines shown first
+     dialogue     : array of {speaker:'rahul'|'priya'|'doctor', text}
+                    doctor lines render centered italic (not a bubble)
+     choices      : two options; each adds its own extraLines when picked
+     narrationAfter: centered italic line(s) shown after the choice resolves
+     final        : true only on the last scene (shows Restart, not Continue)
+
+   NOTE: raw entries below only specify {speaker, text}. The `side`
+   property is added automatically and safely by
+   validateAndNormalizeStory() before the story is ever rendered,
+   so there is no chance of a dialogue object reaching the DOM
+   builders without a valid side.
+================================================================ */
+const STORY = [
+  // ---------------- Scene 1 : Doctor Visit ----------------
+  {
+    title: "Doctor Visit",
+    narration: ["Scene 1 · City Medical Center — Tuesday, 9:40 AM"],
+    dialogue: [
+      { speaker: "doctor", text: "Dr. Patel reviews Rahul's bloodwork and joint imaging: \u201cRahul, this confirms it — you have Rheumatoid Arthritis, an autoimmune condition that causes joint inflammation.\u201d" },
+      { speaker: "rahul", text: "That explains the stiffness every morning... What's the treatment?" },
+      { speaker: "doctor", text: "Dr. Patel: \u201cI'm prescribing Humira (adalimumab) — a biologic medication that can significantly reduce inflammation and slow joint damage.\u201d" }
+    ],
+    choices: [
+      {
+        label: "Ask what happens next",
+        extraLines: [
+          { speaker: "rahul", text: "Okay — what happens after you prescribe it? Do I just pick it up at the pharmacy?" },
+          { speaker: "doctor", text: "Dr. Patel: \u201cNot quite. Because Humira is a specialty biologic, your insurance requires Prior Authorization before it's covered.\u201d" }
+        ]
+      },
+      {
+        label: "Ask about the diagnosis",
+        extraLines: [
+          { speaker: "rahul", text: "Is Rheumatoid Arthritis something that gets worse over time?" },
+          { speaker: "doctor", text: "Dr. Patel: \u201cIt can, especially if treatment is delayed. That's part of why we want to start Humira as soon as possible.\u201d" }
+        ]
+      }
+    ],
+    narrationAfter: ["Next: Dr. Patel's office starts the insurance process."]
+  },
+
+  // ---------------- Scene 2 : Insurance Roadblock ----------------
+  {
+    title: "Insurance Roadblock",
+    narration: [
+      "Scene 2 · Dr. Patel's Office, Later That Day",
+      "In this story, Rahul's insurer is StarCare Health — a fictional, illustrative example payer used to walk through the process."
+    ],
+    dialogue: [
+      { speaker: "doctor", text: "Flow for this request: Provider → Prior Authorization Request → Payer. No pharmacy is involved at this stage." },
+      { speaker: "priya", text: "Hi Rahul! I'm Priya, a healthcare operations specialist. I help patients understand exactly what's happening behind the scenes with requests like yours." }
+    ],
+    choices: [
+      {
+        label: "Ask why the pharmacy isn't involved yet",
+        extraLines: [
+          { speaker: "rahul", text: "Wait — the pharmacy isn't involved at all?" },
+          { speaker: "priya", text: "Not yet. For provider-administered or specialty drugs like Humira, the request often goes straight from the clinic to the insurer, StarCare Health." }
+        ]
+      },
+      {
+        label: "Ask what \u201cPA\u201d actually stands for",
+        extraLines: [
+          { speaker: "rahul", text: "Sorry — what does \u201cPA\u201d even stand for?" },
+          { speaker: "priya", text: "Prior Authorization! It just means StarCare Health wants to review the request before agreeing to pay for it." }
+        ]
+      }
+    ],
+    narrationAfter: ["A detail worth remembering: once a PA is approved, it's typically saved on file with the payer for future refills."]
+  },
+
+  // ---------------- Scene 3 : What is PA? ----------------
+  {
+    title: "What is PA?",
+    narration: ["Scene 3 · Understanding Prior Authorization"],
+    dialogue: [
+      { speaker: "priya", text: "Think of Prior Authorization like asking permission before insurance agrees to pay for something." },
+      { speaker: "priya", text: "It isn't just paperwork for paperwork's sake — insurers use it to check that a treatment matches medical guidelines." },
+      { speaker: "priya", text: "For milder conditions, a short delay might not matter much. But for aggressive diagnoses like your Rheumatoid Arthritis, delays can actually affect disease progression." },
+      { speaker: "priya", text: "That's not just my opinion — the AMA 2023 PA Survey found that PA causes treatment delays in the majority of cases." }
+    ],
+    choices: [
+      {
+        label: "Ask if PA is always required",
+        extraLines: [
+          { speaker: "rahul", text: "Does every medication need this?" },
+          { speaker: "priya", text: "No — usually just costly, specialty, or higher-risk medications like biologics. Common generics rarely need it." }
+        ]
+      },
+      {
+        label: "Ask who decides the criteria",
+        extraLines: [
+          { speaker: "rahul", text: "Who decides what counts as \u201cmedically necessary\u201d?" },
+          { speaker: "priya", text: "Each insurer sets its own clinical criteria, often based on national guidelines — but it can still vary between payers." }
+        ]
+      }
+    ],
+    narrationAfter: ["Next: let's see exactly what StarCare Health checks during its review."]
+  },
+
+  // ---------------- Scene 4 : Insurance Review ----------------
+  {
+    title: "Insurance Review",
+    narration: ["Scene 4 · Inside StarCare Health's Review"],
+    dialogue: [
+      { speaker: "priya", text: "StarCare Health's review usually checks four main things:" },
+      { speaker: "priya", text: "1. Eligibility — is Rahul actively enrolled, and is this benefit covered under his plan?" },
+      { speaker: "priya", text: "2. Clinical documentation — do the doctor's notes support the diagnosis and treatment plan?" },
+      { speaker: "priya", text: "3. ICD-10 diagnosis match — does the billing code line up with Rheumatoid Arthritis, the condition Humira was prescribed for?" },
+      { speaker: "priya", text: "4. Step therapy history — has Rahul already tried a lower-cost treatment first, as StarCare Health's policy requires?" }
+    ],
+    choices: [
+      {
+        label: "Ask why step therapy exists",
+        extraLines: [
+          { speaker: "rahul", text: "Why do I have to try other drugs first?" },
+          { speaker: "priya", text: "It's meant to control costs by trying lower-cost options first — but for cases that need faster treatment, it can slow things down." }
+        ]
+      },
+      {
+        label: "Ask what happens if something is missing",
+        extraLines: [
+          { speaker: "rahul", text: "What if something's missing from the paperwork?" },
+          { speaker: "priya", text: "Then StarCare Health can deny the request until it's provided — which is actually what happens next in your case." }
+        ]
+      }
+    ],
+    narrationAfter: ["The review is complete. Let's see the result."]
+  },
+
+  // ---------------- Scene 5 : Denial ----------------
+  {
+    title: "Denial",
+    narration: [
+      "Scene 5 · Three Business Days Later",
+      "A letter arrives: Prior Authorization — Denied."
+    ],
+    dialogue: [
+      { speaker: "priya", text: "The reason listed is missing step therapy documentation — StarCare Health doesn't yet have proof you tried a prior medication first." },
+      { speaker: "rahul", text: "Denied?? Does that mean I can't get Humira at all?" },
+      { speaker: "priya", text: "Not at all. A denial isn't the end of the road — it usually just means something needs to be added or clarified, then resubmitted or appealed." },
+      { speaker: "priya", text: "There's a cost on our side too: PA denials cost physician offices 2+ staff hours to resolve, on average." }
+    ],
+    choices: [
+      {
+        label: "Ask what Rahul should do now",
+        extraLines: [
+          { speaker: "rahul", text: "So what do I do now?" },
+          { speaker: "priya", text: "We appeal! Dr. Patel's office will gather documentation showing why Humira is appropriate now." }
+        ]
+      },
+      {
+        label: "Ask how common denials are",
+        extraLines: [
+          { speaker: "rahul", text: "Does this happen to a lot of people?" },
+          { speaker: "priya", text: "It's common, especially for specialty drugs — which is exactly why the appeal process exists." }
+        ]
+      }
+    ],
+    narrationAfter: ["Next: let's follow the appeal."]
+  },
+
+  // ---------------- Scene 6 : Appeal ----------------
+  {
+    title: "Appeal",
+    narration: ["Scene 6 · Filing the Appeal"],
+    dialogue: [
+      { speaker: "priya", text: "Step 1 — Gather supporting documents: prior treatment history, lab results, and visit notes." },
+      { speaker: "priya", text: "Step 2 — Dr. Patel writes a Letter of Medical Necessity (LMN) explaining why Humira is appropriate now." },
+      { speaker: "priya", text: "Step 3 — The office formally files the appeal with StarCare Health, referencing the original PA request." }
+    ],
+    choices: [
+      {
+        label: "Ask what makes a strong LMN",
+        extraLines: [
+          { speaker: "rahul", text: "What makes that letter convincing?" },
+          { speaker: "priya", text: "Specific clinical detail — symptoms, prior treatments, lab values, and urgency — rather than a general statement." }
+        ]
+      },
+      {
+        label: "Ask how long the appeal takes",
+        extraLines: [
+          { speaker: "rahul", text: "How long until we hear back?" },
+          { speaker: "priya", text: "It varies by payer, but StarCare Health, like most insurers, has a required turnaround window for appeal decisions." }
+        ]
+      }
+    ],
+    narrationAfter: ["The appeal has been submitted and reviewed."]
+  },
+
+  // ---------------- Scene 7 : Approval ----------------
+  {
+    title: "Approval",
+    narration: [
+      "Scene 7 · One Week Later",
+      "A new letter arrives: Prior Authorization — Approved."
+    ],
+    dialogue: [
+      { speaker: "priya", text: "The appeal worked — StarCare Health approved the Prior Authorization for Humira." },
+      { speaker: "priya", text: "You'll receive a reference number for this approval, and it's saved permanently on file with StarCare Health." },
+      { speaker: "priya", text: "That means no repeat PA is needed for this medication going forward, as long as your plan and prescription stay the same." },
+      { speaker: "rahul", text: "That's such a relief. Thank you, Priya." }
+    ],
+    choices: [
+      {
+        label: "Ask if every insurer works this way",
+        extraLines: [
+          { speaker: "rahul", text: "Does every insurance company save it the same way?" },
+          { speaker: "priya", text: "Policies vary — remember, StarCare Health is just an illustrative example here — but many real payers do keep approved PAs on file for a set period." }
+        ]
+      },
+      {
+        label: "Ask what to keep for records",
+        extraLines: [
+          { speaker: "rahul", text: "Should I keep anything for my own records?" },
+          { speaker: "priya", text: "Yes — save your approval letter and reference number in case you ever need to confirm coverage." }
+        ]
+      }
+    ],
+    narrationAfter: ["Final scene: let's look back at what this journey taught us."]
+  },
+
+  // ---------------- Scene 8 : Takeaways ----------------
+  {
+    title: "Takeaways",
+    narration: ["Scene 8 · Takeaways"],
+    dialogue: [
+      { speaker: "rahul", text: "Patient perspective — what I learned: Prior Authorization can feel confusing and slow, but it's a process, not a dead end. Denials can be appealed, and approvals often stick long-term." },
+      { speaker: "priya", text: "System perspective — what we track: denial rate, appeal success rate, and resolution time. Watching those numbers is how health systems like StarCare Health (illustrative) work to make the process faster and clearer for patients like Rahul." }
+    ],
+    choices: [],
+    narrationAfter: ["You've completed the Prior Authorization Story Simulator."],
+    final: true
+  }
+];
+
+/* ================================================================
+   VALIDATION / NORMALIZATION
+   Runs once, before anything is rendered. Walks every scene's
+   dialogue array and every choice's extraLines array, and:
+     1. Confirms `speaker` is a known key in SPEAKER_SIDE.
+     2. Confirms `text` is a non-empty string.
+     3. Attaches a guaranteed-valid `side` ("left" | "right" | "center")
+        to the line object itself.
+   If a line is malformed (unknown speaker, missing text), it is
+   logged to the console and safely coerced into a neutral,
+   centered narration line rather than being allowed to reach the
+   DOM builders and throw on an undefined lookup.
+================================================================ */
+function normalizeLine(line, context) {
+  if (!line || typeof line !== "object") {
+    console.error("PA Simulator: skipped a malformed line in " + context, line);
+    return { speaker: "narrator", text: "", side: "center" };
+  }
+
+  const speaker = line.speaker;
+  const text = typeof line.text === "string" ? line.text : "";
+  let side = SPEAKER_SIDE[speaker];
+
+  if (!side) {
+    console.error(
+      "PA Simulator: unknown speaker \"" + speaker + "\" in " + context +
+      " — defaulting to centered narration so the app doesn't crash."
+    );
+    side = "center";
+  }
+
+  if (!text) {
+    console.error("PA Simulator: empty text for speaker \"" + speaker + "\" in " + context);
+  }
+
+  return { speaker: speaker || "narrator", text: text, side: side };
+}
+
+function validateAndNormalizeStory(story) {
+  story.forEach((scene, sceneIdx) => {
+    const sceneCtx = "scene[" + sceneIdx + "] (\"" + (scene.title || "untitled") + "\")";
+
+    // Normalize main dialogue
+    scene.dialogue = Array.isArray(scene.dialogue)
+      ? scene.dialogue.map((line, i) => normalizeLine(line, sceneCtx + ".dialogue[" + i + "]"))
+      : [];
+
+    // Normalize choice extraLines
+    scene.choices = Array.isArray(scene.choices)
+      ? scene.choices.map((choice, cIdx) => {
+          const choiceCtx = sceneCtx + ".choices[" + cIdx + "]";
+          if (!choice || typeof choice !== "object") {
+            console.error("PA Simulator: skipped a malformed choice in " + choiceCtx, choice);
+            return { label: "Continue", extraLines: [] };
+          }
+          return {
+            label: typeof choice.label === "string" ? choice.label : "Continue",
+            extraLines: Array.isArray(choice.extraLines)
+              ? choice.extraLines.map((line, i) => normalizeLine(line, choiceCtx + ".extraLines[" + i + "]"))
+              : []
+          };
+        })
+      : [];
+
+    // Ensure narration arrays always exist so .forEach never throws
+    scene.narration = Array.isArray(scene.narration) ? scene.narration : [];
+    scene.narrationAfter = Array.isArray(scene.narrationAfter) ? scene.narrationAfter : [];
+  });
+
+  return story;
+}
+
+// Normalize the story once, immediately, before any rendering happens.
+validateAndNormalizeStory(STORY);
+
+/* ================================================================
+   STATE
+================================================================ */
+let sceneIndex = 0;
+
+/* ================================================================
+   DOM REFERENCES
+================================================================ */
+const chatFeed     = document.getElementById("chatFeed");
+const choiceArea   = document.getElementById("choiceArea");
+const continueArea = document.getElementById("continueArea");
+const progressBar  = document.getElementById("progressBar");
+const sceneLabel   = document.getElementById("sceneLabel");
+
+/* ================================================================
+   BUILDERS — every node is created with createElement and attached
+   with appendChild. chatFeed.innerHTML is never reassigned.
+================================================================ */
+
+// Centered italic line for narrator or doctor text (side === "center").
+function appendNarration(text, kind) {
+  if (!text) return; // guard against empty/undefined text — nothing to render
+  const p = document.createElement("p");
+  p.className = "fade-in text-center italic text-sm md:text-[15px] " +
+    (kind === "doctor" ? "text-slate-600" : "text-slate-400") +
+    " px-4";
+  p.textContent = text;
+  chatFeed.appendChild(p);
+  scrollFeedToBottom();
+}
+
+// Chat bubble for a left- or right-side speaker (Rahul / Priya).
+// `side` is read directly off the already-normalized line object,
+// so this function never has to guess or fall back to a lookup
+// that could return undefined.
+function appendBubble(speakerKey, text, side) {
+  if (!text) return; // guard against empty/undefined text — nothing to render
+
+  // CHARACTERS may not have an entry for every possible key (defensive
+  // fallback), so build a safe display profile instead of accessing
+  // CHARACTERS[speakerKey] directly and risking undefined.name/.emoji.
+  const known = CHARACTERS[speakerKey];
+  const character = known || { name: speakerKey || "Unknown", emoji: "💬" };
+  const isRight = side === "right";
+
+  const row = document.createElement("div");
+  row.className = "fade-in flex items-end gap-2 " +
+    (isRight ? "flex-row-reverse self-end" : "self-start");
+  row.style.maxWidth = "88%";
+
+  const avatar = document.createElement("div");
+  avatar.className = "flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-lg " +
+    (isRight ? "bg-priyabg" : "bg-rahulbg");
+  avatar.textContent = character.emoji;
+
+  const bubbleWrap = document.createElement("div");
+  bubbleWrap.className = "flex flex-col " + (isRight ? "items-end" : "items-start");
+
+  const nameTag = document.createElement("span");
+  nameTag.className = "text-[11px] font-semibold mb-1 " +
+    (isRight ? "text-priya" : "text-rahul");
+  nameTag.textContent = character.name;
+
+  const bubble = document.createElement("div");
+  bubble.className = "relative px-4 py-2.5 rounded-2xl text-sm md:text-[15px] leading-relaxed shadow-sm " +
+    (isRight
+      ? "bg-priyabg text-ink bubble-tail-right rounded-tr-sm"
+      : "bg-rahulbg text-ink bubble-tail-left rounded-tl-sm");
+  bubble.textContent = text;
+
+  bubbleWrap.appendChild(nameTag);
+  bubbleWrap.appendChild(bubble);
+
+  row.appendChild(avatar);
+  row.appendChild(bubbleWrap);
+  chatFeed.appendChild(row);
+  scrollFeedToBottom();
+}
+
+// Single dispatcher used everywhere a normalized line needs rendering.
+// Every line passed in has already gone through normalizeLine(), so
+// `line.side` is guaranteed to be "left", "right", or "center" —
+// there is no branch here that can hit an undefined case.
+function renderLine(line) {
+  if (!line) return; // defensive: never access properties of undefined
+  if (line.side === "center") {
+    appendNarration(line.text, line.speaker === "doctor" ? "doctor" : "narrator");
+  } else {
+    appendBubble(line.speaker, line.text, line.side);
+  }
+}
+
+function scrollFeedToBottom() {
+  chatFeed.scrollTop = chatFeed.scrollHeight;
+}
+
+/* ================================================================
+   PROGRESS BAR — 8 segments
+================================================================ */
+function renderProgressBar() {
+  progressBar.replaceChildren(); // progressBar is not the chat container, safe to clear
+  STORY.forEach((scene, i) => {
+    const seg = document.createElement("div");
+    seg.className = "h-1.5 flex-1 rounded-full " +
+      (i <= sceneIndex ? "bg-priya" : "bg-line");
+    progressBar.appendChild(seg);
+  });
+  const currentScene = STORY[sceneIndex];
+  sceneLabel.textContent = "Scene " + (sceneIndex + 1) + " of " + STORY.length +
+    (currentScene ? " · " + currentScene.title : "");
+}
+
+/* ================================================================
+   SCENE RENDERING
+================================================================ */
+function playScene(index) {
+  const scene = STORY[index];
+  if (!scene) {
+    console.error("PA Simulator: no scene found at index " + index);
+    return;
+  }
+  renderProgressBar();
+
+  // Divider between scenes (skip on very first scene)
+  if (index > 0) {
+    const divider = document.createElement("div");
+    divider.className = "flex items-center gap-3 my-1";
+    const l1 = document.createElement("div");
+    l1.className = "h-px flex-1 bg-line";
+    const label = document.createElement("span");
+    label.className = "text-[11px] uppercase tracking-wide text-slate-400 font-semibold";
+    label.textContent = "Scene " + (index + 1) + " · " + scene.title;
+    const l2 = document.createElement("div");
+    l2.className = "h-px flex-1 bg-line";
+    divider.appendChild(l1);
+    divider.appendChild(label);
+    divider.appendChild(l2);
+    chatFeed.appendChild(divider);
+  }
+
+  scene.narration.forEach(text => appendNarration(text, "narrator"));
+
+  // Every line here has already been normalized to include a valid `side`.
+  scene.dialogue.forEach(line => renderLine(line));
+
+  if (scene.choices.length > 0) {
+    renderChoices(scene);
+  } else {
+    // No choices (final scene) — go straight to closing narration + control.
+    scene.narrationAfter.forEach(text => appendNarration(text, "narrator"));
+    renderEndControl(scene);
+  }
+}
+
+/* ================================================================
+   CHOICES — two buttons that influence dialogue, then progression
+================================================================ */
+function renderChoices(scene) {
+  choiceArea.replaceChildren(); // choiceArea is a controls container, not the chat feed
+  continueArea.replaceChildren();
+
+  const buttons = [];
+
+  scene.choices.forEach((choice) => {
+    const btn = document.createElement("button");
+    btn.className = "choice-btn text-left bg-surface border border-line hover:border-priya hover:bg-priyabg/40 rounded-xl px-4 py-3 text-sm font-medium text-ink transition-colors";
+    btn.textContent = choice.label;
+    btn.addEventListener("click", () => {
+      // lock both choice buttons once one is picked
+      buttons.forEach(b => b.disabled = true);
+      btn.classList.add("border-priya", "bg-priyabg/40");
+
+      // Every extraLine here has already been normalized (valid `side`).
+      choice.extraLines.forEach(line => renderLine(line));
+      scene.narrationAfter.forEach(text => appendNarration(text, "narrator"));
+
+      // remove choice buttons, show continue/finish control
+      setTimeout(() => {
+        choiceArea.replaceChildren();
+        renderEndControl(scene);
+      }, 150);
+    });
+    buttons.push(btn);
+    choiceArea.appendChild(btn);
+  });
+}
+
+/* ================================================================
+   CONTINUE / RESTART CONTROL
+================================================================ */
+function renderEndControl(scene) {
+  continueArea.replaceChildren();
+
+  const btn = document.createElement("button");
+
+  if (scene.final) {
+    btn.className = "bg-good text-white font-semibold text-sm px-6 py-2.5 rounded-full shadow-sm hover:opacity-90 transition-opacity";
+    btn.textContent = "Restart Story";
+    btn.addEventListener("click", restartStory);
+  } else {
+    btn.className = "bg-priya text-white font-semibold text-sm px-6 py-2.5 rounded-full shadow-sm hover:opacity-90 transition-opacity";
+    btn.textContent = "Continue →";
+    btn.addEventListener("click", () => {
+      sceneIndex += 1;
+      continueArea.replaceChildren();
+      playScene(sceneIndex);
+    });
+  }
+
+  continueArea.appendChild(btn);
+}
+
+/* ================================================================
+   RESTART
+================================================================ */
+function restartStory() {
+  sceneIndex = 0;
+  chatFeed.replaceChildren();   // clearing via replaceChildren (not innerHTML =) is allowed —
+                                 // it's a DOM API call, not an innerHTML assignment.
+  choiceArea.replaceChildren();
+  continueArea.replaceChildren();
+  playScene(sceneIndex);
+}
+
+/* ================================================================
+   INIT
+================================================================ */
+playScene(sceneIndex);
+</script>
+</body>
+</html>
