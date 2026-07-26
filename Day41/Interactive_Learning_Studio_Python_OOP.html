@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Learning Studio · Python OOP</title>
+<style>
+:root{
+  --bg:#0e1116;
+  --bg-alt:#141922;
+  --card:#1a212c;
+  --card-hi:#212a37;
+  --line:#2a3444;
+  --text:#dbe3ef;
+  --text-dim:#8b97ab;
+  --blue:#4b8bbe;
+  --yellow:#ffd43b;
+  --green:#5fd88f;
+  --red:#ff6b6b;
+  --mono:'Courier New', 'JetBrains Mono', monospace;
+  --sans:'Segoe UI', Helvetica, Arial, sans-serif;
+  --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  line-height:1.6;
+  padding-bottom:80px;
+}
+::selection{background:var(--blue);color:#fff;}
+a{color:var(--yellow);}
+.wrap{max-width:900px;margin:0 auto;padding:0 20px;}
+
+/* ---------- TOP BAR ---------- */
+#topbar{
+  position:sticky;top:0;z-index:100;
+  background:rgba(14,17,22,0.92);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+#topbar .inner{
+  max-width:900px;margin:0 auto;padding:12px 20px;
+  display:flex;align-items:center;gap:16px;
+}
+#topbar .brand{font-family:var(--mono);font-weight:700;color:var(--yellow);white-space:nowrap;font-size:14px;}
+#topbar .brand span{color:var(--blue);}
+#progress-track{flex:1;height:8px;background:var(--line);border-radius:6px;overflow:hidden;}
+#progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .5s ease;}
+#progress-pct{font-family:var(--mono);font-size:12px;color:var(--text-dim);min-width:38px;text-align:right;}
+
+/* ---------- HERO ---------- */
+.hero{
+  padding:64px 0 40px;
+  border-bottom:1px solid var(--line);
+  background:
+    radial-gradient(circle at 15% 20%, rgba(75,139,190,0.12), transparent 45%),
+    radial-gradient(circle at 85% 0%, rgba(255,212,59,0.08), transparent 40%);
+}
+.eyebrow{
+  font-family:var(--mono);font-size:12px;letter-spacing:.14em;
+  color:var(--blue);text-transform:uppercase;margin-bottom:14px;
+}
+.hero h1{
+  font-size:clamp(32px,5vw,48px);line-height:1.1;font-weight:800;
+  margin-bottom:10px;
+}
+.hero h1 .accent{color:var(--yellow);}
+.hero p.lead{color:var(--text-dim);font-size:17px;max-width:640px;margin-bottom:28px;}
+
+.pill-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:32px;}
+.pill{
+  font-family:var(--mono);font-size:12px;padding:6px 12px;border-radius:20px;
+  background:var(--card);border:1px solid var(--line);color:var(--text-dim);
+}
+
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:30px;}
+.info-card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;
+}
+.info-card .label{font-family:var(--mono);font-size:11px;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.info-card .value{font-size:14px;color:var(--text);}
+.info-card ul{padding-left:18px;font-size:14px;color:var(--text);}
+
+.reward-box{
+  background:linear-gradient(135deg, rgba(255,212,59,0.08), rgba(75,139,190,0.08));
+  border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;
+  display:flex;align-items:center;gap:14px;
+}
+.reward-box .icon{font-size:28px;}
+.reward-box b{color:var(--yellow);}
+
+#start-btn{
+  margin-top:28px;
+  background:var(--yellow);color:#141922;border:none;font-weight:700;
+  font-family:var(--sans);font-size:15px;padding:14px 28px;border-radius:8px;
+  cursor:pointer;transition:transform .15s ease, box-shadow .15s ease;
+}
+#start-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(255,212,59,0.25);}
+
+/* ---------- MODULE NAV DOTS ---------- */
+#module-nav{
+  display:flex;gap:8px;justify-content:center;padding:22px 0;flex-wrap:wrap;
+}
+.nav-dot{
+  font-family:var(--mono);font-size:12px;padding:8px 14px;border-radius:20px;
+  border:1px solid var(--line);background:var(--card);color:var(--text-dim);
+  cursor:pointer;transition:.2s;
+}
+.nav-dot.unlocked{color:var(--text);}
+.nav-dot.active{border-color:var(--blue);color:var(--blue);}
+.nav-dot.done{border-color:var(--green);color:var(--green);}
+.nav-dot.locked{opacity:.4;cursor:not-allowed;}
+
+/* ---------- MODULE ---------- */
+.module{
+  padding:60px 0;border-bottom:1px solid var(--line);
+  display:none;
+}
+.module.visible{display:block;animation:fadein .5s ease;}
+@keyframes fadein{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.module.locked-view{display:none;}
+
+.mod-head{margin-bottom:30px;}
+.mod-num{font-family:var(--mono);color:var(--blue);font-size:13px;letter-spacing:.1em;text-transform:uppercase;}
+.mod-title{font-size:28px;font-weight:800;margin:6px 0 10px;}
+.mod-sub{color:var(--text-dim);font-size:15px;}
+
+h3.section-h{
+  font-size:18px;color:var(--yellow);margin:34px 0 12px;
+  display:flex;align-items:center;gap:8px;
+}
+h3.section-h::before{content:'';width:4px;height:18px;background:var(--yellow);border-radius:2px;}
+
+p{margin-bottom:12px;color:var(--text);}
+.text-block p{color:#c4cede;}
+
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px 22px;margin-bottom:16px;
+}
+.analogy{
+  border-left:3px solid var(--blue);
+}
+.analogy .tag{font-family:var(--mono);font-size:11px;color:var(--blue);text-transform:uppercase;margin-bottom:8px;}
+
+pre{
+  background:#0a0d12;border:1px solid var(--line);border-radius:8px;
+  padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;
+  color:#c7e6ff;margin-bottom:16px;line-height:1.55;
+}
+pre .c-kw{color:#ff79c6;}
+pre .c-str{color:#f1fa8c;}
+pre .c-com{color:#6272a4;}
+pre .c-fn{color:#8be9fd;}
+pre .c-num{color:#bd93f9;}
+
+.diagram{
+  background:#0a0d12;border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px;margin-bottom:16px;overflow-x:auto;
+}
+
+.compare-table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:14px;}
+.compare-table th,.compare-table td{
+  border:1px solid var(--line);padding:10px 12px;text-align:left;
+}
+.compare-table th{background:var(--card-hi);color:var(--yellow);font-family:var(--mono);font-size:12px;text-transform:uppercase;}
+.compare-table td{background:var(--card);}
+
+.misconception{border-left:3px solid var(--red);}
+.misconception .tag{color:var(--red);}
+.takeaways{border-left:3px solid var(--green);}
+.takeaways .tag{color:var(--green);}
+.takeaways ul{padding-left:20px;}
+.takeaways li{margin-bottom:6px;}
+
+/* exercise */
+.exercise{border:1px dashed var(--blue);background:rgba(75,139,190,0.05);}
+.exercise .tag{color:var(--blue);}
+.exercise textarea{
+  width:100%;min-height:100px;background:#0a0d12;color:var(--text);
+  border:1px solid var(--line);border-radius:8px;padding:10px;font-family:var(--mono);
+  font-size:13px;margin-top:10px;resize:vertical;
+}
+.reveal-btn{
+  margin-top:10px;background:transparent;border:1px solid var(--blue);color:var(--blue);
+  padding:8px 14px;border-radius:6px;font-family:var(--sans);cursor:pointer;font-size:13px;
+}
+.reveal-btn:hover{background:var(--blue);color:#fff;}
+.solution{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);}
+.solution.show{display:block;}
+
+/* interactive widget generic */
+.widget{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:16px;}
+.widget label{display:block;font-family:var(--mono);font-size:12px;color:var(--text-dim);margin-bottom:6px;}
+.widget input[type=range]{width:100%;}
+.widget .out{
+  background:#0a0d12;border-radius:8px;padding:12px;font-family:var(--mono);font-size:13px;
+  margin-top:10px;color:var(--green);white-space:pre-wrap;
+}
+.widget button{
+  background:var(--blue);color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:13px;margin-top:8px;margin-right:8px;
+}
+.widget button:hover{opacity:.85;}
+.widget button.sec{background:var(--card-hi);border:1px solid var(--line);color:var(--text);}
+.class-box{
+  border:2px solid var(--blue);border-radius:8px;padding:10px 14px;background:rgba(75,139,190,0.08);
+  display:inline-block;margin:4px;font-family:var(--mono);font-size:13px;
+}
+.class-box.child{border-color:var(--green);background:rgba(95,216,143,0.08);}
+.arrow-down{text-align:center;color:var(--text-dim);font-size:18px;margin:2px 0;}
+
+/* ---------- QUIZ ---------- */
+.quiz{
+  margin-top:44px;background:var(--bg-alt);border:1px solid var(--line);border-radius:var(--radius);
+  padding:28px 24px;
+}
+.quiz h3{color:var(--yellow);font-size:18px;margin-bottom:4px;}
+.quiz .sub{color:var(--text-dim);font-size:13px;margin-bottom:20px;}
+.q-block{margin-bottom:26px;padding-bottom:20px;border-bottom:1px solid var(--line);}
+.q-block:last-of-type{border-bottom:none;}
+.q-text{font-weight:600;margin-bottom:12px;}
+.q-options{display:flex;flex-direction:column;gap:8px;}
+.q-opt{
+  background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 14px;
+  cursor:pointer;font-size:14px;transition:.15s;
+}
+.q-opt:hover{border-color:var(--blue);}
+.q-opt.selected{border-color:var(--blue);background:rgba(75,139,190,0.1);}
+.q-opt.correct{border-color:var(--green);background:rgba(95,216,143,0.12);}
+.q-opt.incorrect{border-color:var(--red);background:rgba(255,107,107,0.12);}
+.q-explain{
+  display:none;margin-top:10px;font-size:13px;color:var(--text-dim);
+  background:var(--card);border-left:3px solid var(--blue);padding:10px 12px;border-radius:6px;
+}
+.q-explain.show{display:block;}
+#quiz-submit-1,#quiz-submit-2,#quiz-submit-3,#quiz-submit-4{
+  background:var(--yellow);color:#141922;font-weight:700;border:none;padding:10px 22px;
+  border-radius:8px;cursor:pointer;font-family:var(--sans);
+}
+.quiz-result{
+  display:none;margin-top:20px;padding:18px;border-radius:8px;background:var(--card);
+  border:1px solid var(--line);text-align:center;
+}
+.quiz-result.show{display:block;}
+.quiz-result .score{font-size:32px;font-weight:800;color:var(--yellow);}
+.next-btn{
+  margin-top:14px;background:var(--green);color:#0a2e1a;font-weight:700;border:none;
+  padding:10px 22px;border-radius:8px;cursor:pointer;
+}
+.next-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ---------- FINALE ---------- */
+#finale{padding:60px 0;}
+.finale-head{text-align:center;margin-bottom:40px;}
+.finale-head h2{font-size:32px;color:var(--yellow);}
+.finale-head p{color:var(--text-dim);}
+
+.cheat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:30px;}
+.cheat-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;}
+.cheat-card h4{color:var(--blue);font-family:var(--mono);font-size:13px;margin-bottom:8px;}
+.cheat-card pre{margin:0;font-size:12px;}
+
+.resource-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:20px;}
+.resource-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;}
+.resource-card h4{color:var(--yellow);font-size:14px;margin-bottom:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.05em;}
+.resource-card ul{padding-left:18px;font-size:13.5px;color:var(--text-dim);}
+.resource-card li{margin-bottom:6px;}
+
+.keyword-chip{
+  display:inline-block;background:var(--card-hi);border:1px solid var(--line);border-radius:16px;
+  padding:5px 12px;font-family:var(--mono);font-size:12px;margin:4px 4px 0 0;color:var(--text);
+}
+
+#print-btn{
+  background:transparent;border:1px solid var(--text-dim);color:var(--text-dim);
+  padding:10px 20px;border-radius:8px;cursor:pointer;margin-top:20px;font-family:var(--sans);
+}
+#print-btn:hover{border-color:var(--text);color:var(--text);}
+
+.challenge-box{
+  background:var(--card);border:2px solid var(--yellow);border-radius:var(--radius);padding:24px;margin-bottom:30px;
+}
+.challenge-box h3{color:var(--yellow);margin-bottom:10px;}
+.challenge-box textarea{
+  width:100%;min-height:180px;background:#0a0d12;color:var(--green);
+  border:1px solid var(--line);border-radius:8px;padding:14px;font-family:var(--mono);
+  font-size:13px;margin-top:12px;resize:vertical;
+}
+.challenge-box button{
+  margin-top:10px;background:var(--yellow);color:#141922;border:none;font-weight:700;
+  padding:10px 20px;border-radius:8px;cursor:pointer;
+}
+.check-out{
+  margin-top:12px;font-family:var(--mono);font-size:13px;padding:12px;border-radius:8px;
+  background:#0a0d12;display:none;
+}
+.check-out.show{display:block;}
+
+footer{
+  text-align:center;padding:40px 20px;color:var(--text-dim);font-size:13px;
+}
+
+@media print{
+  #topbar,#module-nav,#start-btn,.reveal-btn,.exercise textarea,#print-btn,.widget button{display:none!important;}
+  .module{display:block!important;}
+  body{background:#fff;color:#111;}
+  .card,pre,.diagram{background:#f5f5f5!important;color:#111!important;border-color:#ccc!important;}
+}
+@media (max-width:600px){
+  .hero{padding:40px 0 28px;}
+  .quiz{padding:20px 16px;}
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="inner">
+    <div class="brand">◆ Learning<span>Studio</span></div>
+    <div id="progress-track"><div id="progress-fill"></div></div>
+    <div id="progress-pct">0%</div>
+  </div>
+</div>
+
+<!-- ================= HERO / INTRO ================= -->
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Python · Object-Oriented Programming</div>
+    <h1>Think in <span class="accent">objects</span>, not just instructions.</h1>
+    <p class="lead">A complete, hands-on tutorial that takes you from your first <code>class</code> keyword to designing multi-class systems with inheritance, polymorphism, and encapsulation — the way real Python codebases are built.</p>
+
+    <div class="pill-row">
+      <span class="pill">⏱ ~75 minutes</span>
+      <span class="pill">🎯 4 modules · 16 quiz questions</span>
+      <span class="pill">🏆 XP + Mastery Badges</span>
+      <span class="pill">🧩 Final coding challenge</span>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="label">Learning Objectives</div>
+        <div class="value">Design classes, control access with encapsulation, build inheritance hierarchies, and write polymorphic code that works across object types.</div>
+      </div>
+      <div class="info-card">
+        <div class="label">Prerequisites</div>
+        <div class="value">Comfortable writing Python functions, variables, lists/dicts, and basic control flow (if/for/while).</div>
+      </div>
+      <div class="info-card">
+        <div class="label">Expected Outcomes</div>
+        <div class="value">You'll design a small object-oriented system from scratch and explain <em>why</em> OOP tools exist, not just their syntax.</div>
+      </div>
+      <div class="info-card">
+        <div class="label">Estimated Completion</div>
+        <div class="value">4 modules × ~15–20 min, self-paced, quizzes gate progress.</div>
+      </div>
+    </div>
+
+    <div class="reward-box">
+      <div class="icon">🏅</div>
+      <div><b>Reward System:</b> Earn XP for every quiz question, unlock a Mastery Badge after each module (Novice → Practitioner → Architect → Master), and collect a completion certificate score at the end. Your progress bar above fills as you go — try to finish above 90% average!</div>
+    </div>
+
+    <button id="start-btn" onclick="document.getElementById('module-nav').scrollIntoView({behavior:'smooth'})">Start Learning →</button>
+  </div>
+</section>
+
+<div id="module-nav" class="wrap"></div>
+
+<!-- ================= MODULE 1 ================= -->
+<section class="module" id="mod-1" data-mod="1">
+  <div class="wrap">
+    <div class="mod-head">
+      <div class="mod-num">Module 1 · Foundational</div>
+      <div class="mod-title">Classes, Objects & Attributes</div>
+      <div class="mod-sub">The blueprint-vs-thing distinction that everything else in OOP builds on.</div>
+    </div>
+
+    <div class="text-block">
+      <p>Every Python value you've used — strings, lists, even integers — is an <b>object</b>: a bundle of data plus the behavior that acts on that data. Object-oriented programming just lets <em>you</em> design your own kinds of objects instead of only using Python's built-in ones.</p>
+      <p>A <b>class</b> is the blueprint. An <b>object</b> (or <b>instance</b>) is a specific thing built from that blueprint. You can make a hundred cars from one blueprint — each car is separate, but they all share the same design.</p>
+    </div>
+
+    <div class="card analogy">
+      <div class="tag">Analogy</div>
+      <p>Think of a <code>class</code> as a cookie cutter and each <code>object</code> as a cookie. The cutter defines the shape (what attributes and methods every cookie will have), but each cookie you stamp out is its own physical cookie — decorate one with sprinkles and the others are untouched. Changing the cutter's shape (editing the class) changes all <em>future</em> cookies, but not cookies you've already baked.</p>
+    </div>
+
+    <h3 class="section-h">Anatomy of a class</h3>
+    <div class="diagram">
+      <div style="font-family:var(--mono);font-size:13px;">
+        <div class="class-box">class Dog:</div>
+        <div style="padding-left:20px;color:#8be9fd;">
+          def __init__(self, name, breed):&nbsp;&nbsp;<span style="color:#6272a4"># the constructor</span><br>
+          &nbsp;&nbsp;self.name = name&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#6272a4"># instance attribute</span><br>
+          &nbsp;&nbsp;self.breed = breed<br><br>
+          def bark(self):&nbsp;&nbsp;<span style="color:#6272a4"># instance method</span><br>
+          &nbsp;&nbsp;return f"{self.name} says Woof!"
+        </div>
+      </div>
+    </div>
+
+    <pre><span class="c-kw">class</span> <span class="c-fn">Dog</span>:
+    <span class="c-com"># __init__ runs automatically when you create an object</span>
+    <span class="c-kw">def</span> <span class="c-fn">__init__</span>(self, name, breed):
+        self.name = name       <span class="c-com"># attribute: data</span>
+        self.breed = breed
+
+    <span class="c-kw">def</span> <span class="c-fn">bark</span>(self):    <span class="c-com"># method: behavior</span>
+        <span class="c-kw">return</span> <span class="c-str">f"{self.name} says Woof!"</span>
+
+<span class="c-com"># --- creating objects (instances) ---</span>
+rex = Dog(<span class="c-str">"Rex"</span>, <span class="c-str">"Labrador"</span>)
+milo = Dog(<span class="c-str">"Milo"</span>, <span class="c-str">"Pug"</span>)
+
+<span class="c-kw">print</span>(rex.bark())   <span class="c-com"># Rex says Woof!</span>
+<span class="c-kw">print</span>(milo.name)  <span class="c-com"># Milo</span></pre>
+
+    <h3 class="section-h">self — why every method needs it</h3>
+    <p><code>self</code> is how a method refers to <em>the specific object it was called on</em>. When you write <code>rex.bark()</code>, Python actually calls <code>Dog.bark(rex)</code> behind the scenes — <code>rex</code> gets passed in as <code>self</code> automatically. That's why <code>self.name</code> inside <code>bark()</code> correctly returns "Rex" and not "Milo".</p>
+
+    <h3 class="section-h">Class attributes vs instance attributes</h3>
+    <table class="compare-table">
+      <tr><th>Instance attribute</th><th>Class attribute</th></tr>
+      <tr><td>Defined via <code>self.x = ...</code> inside methods, usually <code>__init__</code></td><td>Defined directly inside the class body, outside any method</td></tr>
+      <tr><td>Unique per object — <code>rex.name</code> ≠ <code>milo.name</code></td><td>Shared by every object of that class unless overridden</td></tr>
+      <tr><td>Example: <code>self.name</code></td><td>Example: <code>species = "Canine"</code> shared by all dogs</td></tr>
+    </table>
+
+    <pre><span class="c-kw">class</span> <span class="c-fn">Dog</span>:
+    species = <span class="c-str">"Canis familiaris"</span>   <span class="c-com"># class attribute — shared</span>
+
+    <span class="c-kw">def</span> <span class="c-fn">__init__</span>(self, name):
+        self.name = name              <span class="c-com"># instance attribute — unique</span>
+
+rex = Dog(<span class="c-str">"Rex"</span>)
+milo = Dog(<span class="c-str">"Milo"</span>)
+<span class="c-kw">print</span>(rex.species <span class="c-kw">is</span> milo.species)  <span class="c-com"># True — same object in memory</span></pre>
+
+    <div class="widget">
+      <label>🔧 Try it: build a Dog object</label>
+      <label style="margin-top:8px;">Name</label>
+      <input type="text" id="m1-name" value="Buddy" style="width:100%;padding:8px;background:#0a0d12;color:var(--text);border:1px solid var(--line);border-radius:6px;font-family:var(--mono);">
+      <label style="margin-top:8px;">Breed</label>
+      <input type="text" id="m1-breed" value="Beagle" style="width:100%;padding:8px;background:#0a0d12;color:var(--text);border:1px solid var(--line);border-radius:6px;font-family:var(--mono);">
+      <button onclick="m1build()">Instantiate Dog(name, breed)</button>
+      <div class="out" id="m1-out">// output appears here</div>
+    </div>
+
+    <div class="card exercise">
+      <div class="tag">Exercise</div>
+      <p>Write a <code>Book</code> class with instance attributes <code>title</code>, <code>author</code>, and <code>pages</code>, plus a method <code>summary()</code> that returns a string like <code>"Dune by Frank Herbert (412 pages)"</code>.</p>
+      <textarea placeholder="class Book:
+    def __init__(self, ...):
+        ...
+"></textarea>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Show sample solution</button>
+      <div class="solution">
+<pre><span class="c-kw">class</span> <span class="c-fn">Book</span>:
+    <span class="c-kw">def</span> <span class="c-fn">__init__</span>(self, title, author, pages):
+        self.title = title
+        self.author = author
+        self.pages = pages
+
+    <span class="c-kw">def</span> <span class="c-fn">summary</span>(self):
+        <span class="c-kw">return</span> <span class="c-str">f"{self.title} by {self.author} ({self.pages} pages)"</span></pre>
+      </div>
+    </div>
+
+    <div class="card misconception">
+      <div class="tag">Common Misconception</div>
+      <p><b>"A class attribute is just a default value copied into each object."</b> It isn't copied — it's shared. If the class attribute is mutable (like a list) and one object mutates it in place, <em>every</em> object sees the change. This is a classic source of Python bugs: <code>self.items.append(x)</code> on a class-level list affects all instances.</p>
+    </div>
+
+    <div class="card takeaways">
+      <div class="tag">Key Takeaways</div>
+      <ul>
+        <li>A class is a blueprint; an object is a specific instance built from it.</li>
+        <li><code>__init__</code> runs automatically on creation to set up instance attributes.</li>
+        <li><code>self</code> refers to "the object this method was called on."</li>
+        <li>Instance attributes are unique per object; class attributes are shared.</li>
+      </ul>
+    </div>
+
+    <!-- QUIZ 1 -->
+    <div class="quiz" id="quiz-1">
+      <h3>Module 1 Checkpoint</h3>
+      <div class="sub">4 questions · answer all, then submit</div>
+      <div id="quiz-1-body"></div>
+      <button id="quiz-submit-1" onclick="submitQuiz(1)">Submit Answers</button>
+      <div class="quiz-result" id="quiz-result-1">
+        <div class="score" id="quiz-score-1"></div>
+        <div id="quiz-msg-1"></div>
+        <button class="next-btn" id="next-btn-1" onclick="goToModule(2)">Unlock Module 2 →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MODULE 2 ================= -->
+<section class="module" id="mod-2" data-mod="2">
+  <div class="wrap">
+    <div class="mod-head">
+      <div class="mod-num">Module 2 · Building On The Basics</div>
+      <div class="mod-title">Encapsulation & Data Protection</div>
+      <div class="mod-sub">Controlling how an object's internal state can be read and changed.</div>
+    </div>
+
+    <div class="text-block">
+      <p><b>Encapsulation</b> means bundling data with the methods that operate on it, and restricting direct outside access to that data so it can only change in valid ways. In Python, encapsulation is achieved through convention and naming, not hard enforcement.</p>
+    </div>
+
+    <div class="card analogy">
+      <div class="tag">Analogy</div>
+      <p>A vending machine encapsulates its cash box. You interact through a public interface — insert coins, press a button — and the machine decides internally how to validate the transaction and dispense the item. You never reach in and grab the cash box directly (well-designed vending machine, well-designed class). The machine's <em>interface</em> is public; its <em>internals</em> are protected.</p>
+    </div>
+
+    <h3 class="section-h">Naming conventions for access control</h3>
+    <table class="compare-table">
+      <tr><th>Convention</th><th>Syntax</th><th>Meaning</th></tr>
+      <tr><td>Public</td><td><code>self.name</code></td><td>Freely accessible from anywhere</td></tr>
+      <tr><td>Protected</td><td><code>self._name</code></td><td>"Internal use" — a convention, not enforced</td></tr>
+      <tr><td>Private</td><td><code>self.__name</code></td><td>Name-mangled to <code>_ClassName__name</code>, discourages accidental external access</td></tr>
+    </table>
+
+    <pre><span class="c-kw">class</span> <span class="c-fn">BankAccount</span>:
+    <span class="c-kw">def</span> <span class="c-fn">__init__</span>(self, balance):
+        self.__balance = balance    <span class="c-com"># private</span>
+
+    <span class="c-kw">def</span> <span class="c-fn">deposit</span>(self, amount):
+        <span class="c-kw">if</span> amount &gt; <span class="c-num">0</span>:
+            self.__balance += amount
+
+    <span class="c-kw">def</span> <span class="c-fn">get_balance</span>(self):
+        <span class="c-kw">return</span> self.__balance
+
+acc = BankAccount(<span class="c-num">100</span>)
+acc.deposit(<span class="c-num">50</span>)
+<span class="c-kw">print</span>(acc.get_balance())   <span class="c-com"># 150</span>
+<span class="c-com"># acc.__balance  -> AttributeError (name-mangled)</span></pre>
+
+    <h3 class="section-h">The Pythonic way: @property</h3>
+    <p>Instead of writing manual <code>get_x()</code>/<code>set_x()</code> methods like in Java, Python lets you expose a controlled attribute-style interface with <code>@property</code>, so validation runs invisibly whenever code does <code>acc.balance = ...</code>.</p>
+    <pre><span class="c-kw">class</span> <span class="c-fn">BankAccount</span>:
+    <span class="c-kw">def</span> <span class="c-fn">__init__</span>(self, balance):
+        self._balance = balance
+
+    <span class="c-kw">@property</span>
+    <span class="c-kw">def</span> <span class="c-fn">balance</span>(self):
+        <span class="c-kw">return</span> self._balance
+
+    <span class="c-kw">@balance.setter</span>
+    <span class="c-kw">def</span> <span class="c-fn">balance</span>(self, value):
+        <span class="c-kw">if</span> value &lt; <span class="c-num">0</span>:
+            <span class="c-kw">raise</span> ValueError(<span class="c-str">"Balance can't be negative"</span>)
+        self._balance = value
+
+acc = BankAccount(<span class="c-num">100</span>)
+acc.balance = <span class="c-num">200</span>      <span class="c-com"># looks like an attribute, runs validation</span>
+<span class="c-com"># acc.balance = -50  -> raises ValueError</span></pre>
+
+    <div class="widget">
+      <label>🔧 Try it: deposit/withdraw with validation</label>
+      <div id="m2-balance-display" class="out">Balance: ₹100</div>
+      <input type="number" id="m2-amount" value="50" style="width:100%;padding:8px;margin-top:8px;background:#0a0d12;color:var(--text);border:1px solid var(--line);border-radius:6px;font-family:var(--mono);">
+      <button onclick="m2act('deposit')">Deposit</button>
+      <button class="sec" onclick="m2act('withdraw')">Withdraw</button>
+    </div>
+
+    <div class="card exercise">
+      <div class="tag">Exercise</div>
+      <p>Add a <code>@property</code> called <code>pages</code> to a <code>Book</code> class that raises <code>ValueError</code> if set to a number less than 1. Sketch the getter and setter.</p>
+      <textarea placeholder="@property
+def pages(self):
+    ..."></textarea>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Show sample solution</button>
+      <div class="solution">
+<pre><span class="c-kw">@property</span>
+<span class="c-kw">def</span> <span class="c-fn">pages</span>(self):
+    <span class="c-kw">return</span> self._pages
+
+<span class="c-kw">@pages.setter</span>
+<span class="c-kw">def</span> <span class="c-fn">pages</span>(self, value):
+    <span class="c-kw">if</span> value &lt; <span class="c-num">1</span>:
+        <span class="c-kw">raise</span> ValueError(<span class="c-str">"A book needs at least 1 page"</span>)
+    self._pages = value</pre>
+      </div>
+    </div>
+
+    <div class="card misconception">
+      <div class="tag">Common Misconception</div>
+      <p><b>"Double underscore means truly private, like a security wall."</b> Python doesn't enforce access control the way Java's <code>private</code> does. <code>__balance</code> is only <em>name-mangled</em> to <code>_BankAccount__balance</code> — it's still reachable if someone really wants to. Python trusts convention over enforcement ("we're all consenting adults here").</p>
+    </div>
+
+    <div class="card takeaways">
+      <div class="tag">Key Takeaways</div>
+      <ul>
+        <li>Encapsulation bundles data + behavior and guards internal state through a public interface.</li>
+        <li><code>_name</code> is a convention; <code>__name</code> triggers name mangling — neither is truly private.</li>
+        <li><code>@property</code> lets validation run behind normal attribute syntax.</li>
+      </ul>
+    </div>
+
+    <div class="quiz" id="quiz-2">
+      <h3>Module 2 Checkpoint</h3>
+      <div class="sub">4 questions · answer all, then submit</div>
+      <div id="quiz-2-body"></div>
+      <button id="quiz-submit-2" onclick="submitQuiz(2)">Submit Answers</button>
+      <div class="quiz-result" id="quiz-result-2">
+        <div class="score" id="quiz-score-2"></div>
+        <div id="quiz-msg-2"></div>
+        <button class="next-btn" id="next-btn-2" onclick="goToModule(3)">Unlock Module 3 →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MODULE 3 ================= -->
+<section class="module" id="mod-3" data-mod="3">
+  <div class="wrap">
+    <div class="mod-head">
+      <div class="mod-num">Module 3 · Practical Application</div>
+      <div class="mod-title">Inheritance & Class Hierarchies</div>
+      <div class="mod-sub">Reusing and specializing behavior across related classes.</div>
+    </div>
+
+    <div class="text-block">
+      <p><b>Inheritance</b> lets a class (the <b>subclass</b> / <b>child</b>) reuse and extend the attributes and methods of another class (the <b>superclass</b> / <b>parent</b>). It models "is-a" relationships: a <code>Labrador</code> <em>is a</em> <code>Dog</code>, a <code>Dog</code> <em>is an</em> <code>Animal</code>.</p>
+    </div>
+
+    <div class="card analogy">
+      <div class="tag">Analogy</div>
+      <p>Think of a company org chart for job templates. A "Manager" role inherits everything from "Employee" (clock in, get paid) but adds new responsibilities (approve leave). You don't rewrite "clock in" for every role — you inherit it, and override only what's genuinely different.</p>
+    </div>
+
+    <h3 class="section-h">Basic inheritance</h3>
+    <div class="diagram">
+      <div style="text-align:center;">
+        <div class="class-box">Animal<br><span style="font-size:11px;color:#8b97ab">name, make_sound()</span></div>
+        <div class="arrow-down">▲ inherits</div>
+        <div style="display:flex;justify-content:center;gap:20px;">
+          <div class="class-box child">Dog<br><span style="font-size:11px;color:#8b97ab">make_sound() → "Woof"</span></div>
+          <div class="class-box child">Cat<br><span style="font-size:11px;color:#8b97ab">make_sound() → "Meow"</span></div>
+        </div>
+      </div>
+    </div>
+
+    <pre><span class="c-kw">class</span> <span class="c-fn">Animal</span>:
+    <span class="c-kw">def</span> <span class="c-fn">__init__</span>(self, name):
+        self.name = name
+
+    <span class="c-kw">def</span> <span class="c-fn">make_sound</span>(self):
+        <span class="c-kw">return</span> <span class="c-str">"..."</span>
+
+<span class="c-kw">class</span> <span class="c-fn">Dog</span>(Animal):              <span class="c-com"># Dog inherits from Animal</span>
+    <span class="c-kw">def</span> <span class="c-fn">make_sound</span>(self):        <span class="c-com"># override</span>
+        <span class="c-kw">return</span> <span class="c-str">f"{self.name} says Woof!"</span>
+
+<span class="c-kw">class</span> <span class="c-fn">Cat</span>(Animal):
+    <span class="c-kw">def</span> <span class="c-fn">make_sound</span>(self):
+        <span class="c-kw">return</span> <span class="c-str">f"{self.name} says Meow!"</span></pre>
+
+    <h3 class="section-h">super() — extending, not replacing</h3>
+    <p><code>super()</code> calls the parent class's version of a method so you can add to it instead of rewriting it entirely.</p>
+    <pre><span class="c-kw">class</span> <span class="c-fn">Puppy</span>(Dog):
+    <span class="c-kw">def</span> <span class="c-fn">__init__</span>(self, name, age_months):
+        <span class="c-fn">super</span>().__init__(name)      <span class="c-com"># reuse Animal's setup</span>
+        self.age_months = age_months
+
+    <span class="c-kw">def</span> <span class="c-fn">make_sound</span>(self):
+        original = <span class="c-fn">super</span>().make_sound()  <span class="c-com"># reuse Dog's sound</span>
+        <span class="c-kw">return</span> original + <span class="c-str">" (but it's more of a yip)"</span></pre>
+
+    <h3 class="section-h">Single vs multiple inheritance</h3>
+    <table class="compare-table">
+      <tr><th>Single Inheritance</th><th>Multiple Inheritance</th></tr>
+      <tr><td><code>class Dog(Animal):</code> — one parent</td><td><code>class RoboDog(Dog, Robot):</code> — several parents</td></tr>
+      <tr><td>Simple, predictable method resolution</td><td>Powerful but resolved via MRO (Method Resolution Order) — can get complex</td></tr>
+      <tr><td>Most everyday hierarchies</td><td>Mixins: small reusable behavior classes</td></tr>
+    </table>
+
+    <div class="widget">
+      <label>🔧 Try it: polymorphic sound check (see Module 4 for full polymorphism)</label>
+      <button onclick="m3demo()">Loop through [Dog, Cat, Puppy] and call make_sound()</button>
+      <div class="out" id="m3-out">// click the button</div>
+    </div>
+
+    <div class="card exercise">
+      <div class="tag">Exercise</div>
+      <p>Create a <code>Vehicle</code> class with <code>__init__(self, brand)</code> and a method <code>describe()</code>. Then create an <code>ElectricCar(Vehicle)</code> subclass that adds a <code>battery_kwh</code> attribute and overrides <code>describe()</code> to include it, calling <code>super().describe()</code> inside.</p>
+      <textarea placeholder="class Vehicle:
+    ...
+class ElectricCar(Vehicle):
+    ..."></textarea>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Show sample solution</button>
+      <div class="solution">
+<pre><span class="c-kw">class</span> <span class="c-fn">Vehicle</span>:
+    <span class="c-kw">def</span> <span class="c-fn">__init__</span>(self, brand):
+        self.brand = brand
+    <span class="c-kw">def</span> <span class="c-fn">describe</span>(self):
+        <span class="c-kw">return</span> <span class="c-str">f"{self.brand} vehicle"</span>
+
+<span class="c-kw">class</span> <span class="c-fn">ElectricCar</span>(Vehicle):
+    <span class="c-kw">def</span> <span class="c-fn">__init__</span>(self, brand, battery_kwh):
+        <span class="c-fn">super</span>().__init__(brand)
+        self.battery_kwh = battery_kwh
+    <span class="c-kw">def</span> <span class="c-fn">describe</span>(self):
+        base = <span class="c-fn">super</span>().describe()
+        <span class="c-kw">return</span> <span class="c-str">f"{base} with a {self.battery_kwh}kWh battery"</span></pre>
+      </div>
+    </div>
+
+    <div class="card misconception">
+      <div class="tag">Common Misconception</div>
+      <p><b>"Overriding a method deletes the parent's version."</b> It doesn't — the parent method still exists and can be reached with <code>super()</code>. Overriding only changes what gets called <em>by default</em> when you call the method on the child instance.</p>
+    </div>
+
+    <div class="card takeaways">
+      <div class="tag">Key Takeaways</div>
+      <ul>
+        <li>Inheritance models "is-a" relationships and avoids duplicating shared behavior.</li>
+        <li>Subclasses can override methods to specialize behavior.</li>
+        <li><code>super()</code> lets you extend a parent's method rather than replace it outright.</li>
+        <li>Python supports multiple inheritance, resolved through MRO.</li>
+      </ul>
+    </div>
+
+    <div class="quiz" id="quiz-3">
+      <h3>Module 3 Checkpoint</h3>
+      <div class="sub">4 questions · answer all, then submit</div>
+      <div id="quiz-3-body"></div>
+      <button id="quiz-submit-3" onclick="submitQuiz(3)">Submit Answers</button>
+      <div class="quiz-result" id="quiz-result-3">
+        <div class="score" id="quiz-score-3"></div>
+        <div id="quiz-msg-3"></div>
+        <button class="next-btn" id="next-btn-3" onclick="goToModule(4)">Unlock Module 4 →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MODULE 4 ================= -->
+<section class="module" id="mod-4" data-mod="4">
+  <div class="wrap">
+    <div class="mod-head">
+      <div class="mod-num">Module 4 · Mastery</div>
+      <div class="mod-title">Polymorphism, Abstraction & Dunder Methods</div>
+      <div class="mod-sub">Writing code that works across object types, and shaping how your objects behave with built-ins.</div>
+    </div>
+
+    <div class="text-block">
+      <p><b>Polymorphism</b> ("many forms") means code can call the same method name on different object types and get type-appropriate behavior, without knowing or caring about the exact class. <b>Abstraction</b> means defining a required interface (a contract) that subclasses must implement, without providing a usable implementation itself.</p>
+    </div>
+
+    <div class="card analogy">
+      <div class="tag">Analogy</div>
+      <p>A universal TV remote's "power" button is polymorphic: press it on a Sony, Samsung, or LG TV, and each brand's internal circuitry does something different, but you interact through one identical button. You don't need a different remote per brand — that's the power of a shared interface with different implementations.</p>
+    </div>
+
+    <h3 class="section-h">Polymorphism in action</h3>
+    <pre><span class="c-kw">for</span> animal <span class="c-kw">in</span> [Dog(<span class="c-str">"Rex"</span>), Cat(<span class="c-str">"Milo"</span>), Puppy(<span class="c-str">"Fifi"</span>, <span class="c-num">3</span>)]:
+    <span class="c-kw">print</span>(animal.make_sound())   <span class="c-com"># each class supplies its own behavior</span>
+
+<span class="c-com"># duck typing: Python doesn't check the type, only that the method exists</span>
+<span class="c-kw">class</span> <span class="c-fn">Duck</span>:
+    <span class="c-kw">def</span> <span class="c-fn">make_sound</span>(self): <span class="c-kw">return</span> <span class="c-str">"Quack!"</span>
+
+<span class="c-com"># Duck() also works in the loop above — it "quacks like" the interface expects</span></pre>
+
+    <h3 class="section-h">Abstract base classes</h3>
+    <p>Use Python's <code>abc</code> module to force subclasses to implement specific methods, catching missing implementations early instead of failing mysteriously at runtime.</p>
+    <pre><span class="c-kw">from</span> abc <span class="c-kw">import</span> ABC, abstractmethod
+
+<span class="c-kw">class</span> <span class="c-fn">Shape</span>(ABC):
+    <span class="c-kw">@abstractmethod</span>
+    <span class="c-kw">def</span> <span class="c-fn">area</span>(self): ...
+
+<span class="c-kw">class</span> <span class="c-fn">Circle</span>(Shape):
+    <span class="c-kw">def</span> <span class="c-fn">__init__</span>(self, r): self.r = r
+    <span class="c-kw">def</span> <span class="c-fn">area</span>(self): <span class="c-kw">return</span> 3.14159 * self.r ** <span class="c-num">2</span>
+
+<span class="c-com"># Shape()        -> TypeError: can't instantiate abstract class</span>
+<span class="c-com"># Circle(5).area() -> 78.53975   works fine, area() is implemented</span></pre>
+
+    <h3 class="section-h">Dunder (magic) methods</h3>
+    <p>These let your custom objects work naturally with Python's built-in syntax — printing, comparisons, arithmetic — instead of requiring special-case methods.</p>
+    <table class="compare-table">
+      <tr><th>Method</th><th>Triggered by</th></tr>
+      <tr><td><code>__init__</code></td><td><code>MyClass(...)</code></td></tr>
+      <tr><td><code>__str__</code></td><td><code>print(obj)</code> / <code>str(obj)</code></td></tr>
+      <tr><td><code>__eq__</code></td><td><code>obj1 == obj2</code></td></tr>
+      <tr><td><code>__len__</code></td><td><code>len(obj)</code></td></tr>
+      <tr><td><code>__add__</code></td><td><code>obj1 + obj2</code></td></tr>
+    </table>
+    <pre><span class="c-kw">class</span> <span class="c-fn">Point</span>:
+    <span class="c-kw">def</span> <span class="c-fn">__init__</span>(self, x, y): self.x, self.y = x, y
+    <span class="c-kw">def</span> <span class="c-fn">__str__</span>(self): <span class="c-kw">return</span> <span class="c-str">f"({self.x}, {self.y})"</span>
+    <span class="c-kw">def</span> <span class="c-fn">__add__</span>(self, other): <span class="c-kw">return</span> Point(self.x+other.x, self.y+other.y)
+
+p1, p2 = Point(<span class="c-num">1</span>,<span class="c-num">2</span>), Point(<span class="c-num">3</span>,<span class="c-num">4</span>)
+<span class="c-kw">print</span>(p1 + p2)   <span class="c-com"># (4, 6) — thanks to __add__ and __str__</span></pre>
+
+    <div class="widget">
+      <label>🔧 Try it: Point addition simulator</label>
+      <label>Point A (x,y)</label>
+      <input type="text" id="m4-a" value="1,2" style="width:100%;padding:8px;background:#0a0d12;color:var(--text);border:1px solid var(--line);border-radius:6px;font-family:var(--mono);">
+      <label style="margin-top:6px;">Point B (x,y)</label>
+      <input type="text" id="m4-b" value="3,4" style="width:100%;padding:8px;background:#0a0d12;color:var(--text);border:1px solid var(--line);border-radius:6px;font-family:var(--mono);">
+      <button onclick="m4add()">p1 + p2</button>
+      <div class="out" id="m4-out">// output appears here</div>
+    </div>
+
+    <div class="card exercise">
+      <div class="tag">Exercise</div>
+      <p>Add <code>__eq__</code> to the <code>Point</code> class so that <code>Point(1,2) == Point(1,2)</code> returns <code>True</code>. Sketch the method.</p>
+      <textarea placeholder="def __eq__(self, other):
+    ..."></textarea>
+      <button class="reveal-btn" onclick="this.nextElementSibling.classList.toggle('show')">Show sample solution</button>
+      <div class="solution">
+<pre><span class="c-kw">def</span> <span class="c-fn">__eq__</span>(self, other):
+    <span class="c-kw">return</span> self.x == other.x <span class="c-kw">and</span> self.y == other.y</pre>
+      </div>
+    </div>
+
+    <div class="card misconception">
+      <div class="tag">Common Misconception</div>
+      <p><b>"Polymorphism requires inheritance."</b> It doesn't, in Python. <b>Duck typing</b> means any object with the right method works, related by inheritance or not — "if it walks like a duck and quacks like a duck." Python favors flexible behavior-based contracts over strict type hierarchies.</p>
+    </div>
+
+    <div class="card takeaways">
+      <div class="tag">Key Takeaways</div>
+      <ul>
+        <li>Polymorphism lets identical calling code work across different object types.</li>
+        <li>Abstract base classes (<code>ABC</code>/<code>@abstractmethod</code>) enforce a required interface.</li>
+        <li>Dunder methods integrate custom objects with Python's built-in syntax.</li>
+        <li>Duck typing means behavior matters more than declared type.</li>
+      </ul>
+    </div>
+
+    <div class="quiz" id="quiz-4">
+      <h3>Module 4 Checkpoint</h3>
+      <div class="sub">4 questions · answer all, then submit</div>
+      <div id="quiz-4-body"></div>
+      <button id="quiz-submit-4" onclick="submitQuiz(4)">Submit Answers</button>
+      <div class="quiz-result" id="quiz-result-4">
+        <div class="score" id="quiz-score-4"></div>
+        <div id="quiz-msg-4"></div>
+        <button class="next-btn" id="next-btn-4" onclick="goToModule(5)">See Final Challenge →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FINALE ================= -->
+<section class="module" id="mod-5" data-mod="5">
+  <div class="wrap" id="finale">
+    <div class="finale-head">
+      <div class="mod-num" style="text-align:center;">Final Stage</div>
+      <h2>Practical Challenge & Wrap-Up</h2>
+      <p>Bring together classes, encapsulation, inheritance, and polymorphism in one design.</p>
+    </div>
+
+    <div class="challenge-box">
+      <h3>🏆 Final Practical Challenge</h3>
+      <p>Design a small <b>employee management system</b>:</p>
+      <ul style="padding-left:20px;margin-bottom:10px;color:#c4cede;">
+        <li>An <code>Employee</code> base class with <code>name</code>, private <code>__salary</code>, and a method <code>annual_bonus()</code> returning 5% of salary.</li>
+        <li>A <code>Manager(Employee)</code> subclass that overrides <code>annual_bonus()</code> to return 10%, using <code>super()</code> where useful.</li>
+        <li>A <code>__str__</code> method so <code>print(employee)</code> shows <code>"Name — role"</code>.</li>
+        <li>Loop over a list of mixed <code>Employee</code>/<code>Manager</code> objects and print each bonus polymorphically.</li>
+      </ul>
+      <textarea id="challenge-input" placeholder="class Employee:
+    def __init__(self, name, salary):
+        ...
+"></textarea>
+      <button onclick="checkChallenge()">Check my approach</button>
+      <div class="check-out" id="challenge-check"></div>
+    </div>
+
+    <h3 class="section-h">Cheat Sheet</h3>
+    <div class="cheat-grid">
+      <div class="cheat-card"><h4>Define & instantiate</h4><pre><span class="c-kw">class</span> <span class="c-fn">C</span>:
+    <span class="c-kw">def</span> <span class="c-fn">__init__</span>(self, x):
+        self.x = x
+obj = C(<span class="c-num">1</span>)</pre></div>
+      <div class="cheat-card"><h4>Inheritance</h4><pre><span class="c-kw">class</span> <span class="c-fn">Sub</span>(Base):
+    <span class="c-kw">def</span> <span class="c-fn">m</span>(self):
+        <span class="c-kw">return</span> <span class="c-fn">super</span>().m()</pre></div>
+      <div class="cheat-card"><h4>Encapsulation</h4><pre>self._protected
+self.__private
+<span class="c-kw">@property</span>
+<span class="c-kw">def</span> <span class="c-fn">x</span>(self): <span class="c-kw">return</span> self._x</pre></div>
+      <div class="cheat-card"><h4>Abstract class</h4><pre><span class="c-kw">from</span> abc <span class="c-kw">import</span> ABC, abstractmethod
+<span class="c-kw">class</span> <span class="c-fn">A</span>(ABC):
+    <span class="c-kw">@abstractmethod</span>
+    <span class="c-kw">def</span> <span class="c-fn">m</span>(self): ...</pre></div>
+      <div class="cheat-card"><h4>Common dunders</h4><pre>__init__ __str__ __eq__
+__len__ __add__ __repr__</pre></div>
+      <div class="cheat-card"><h4>Polymorphism / duck typing</h4><pre><span class="c-kw">for</span> o <span class="c-kw">in</span> objs:
+    o.speak()  <span class="c-com"># any class works</span></pre></div>
+    </div>
+
+    <h3 class="section-h">Summary Notes</h3>
+    <div class="card">
+      <p><b>Classes/objects:</b> a class is a blueprint, an object an instance; <code>self</code> ties a method to its instance.<br>
+      <b>Encapsulation:</b> bundle data + behavior; use <code>_</code>/<code>__</code> conventions and <code>@property</code> for controlled access.<br>
+      <b>Inheritance:</b> reuse and specialize behavior across an "is-a" hierarchy using <code>super()</code>.<br>
+      <b>Polymorphism/Abstraction:</b> write code against a shared interface; use <code>ABC</code> to enforce required methods; dunder methods integrate with Python syntax.</p>
+    </div>
+    <button id="print-btn" onclick="window.print()">🖨 Print / Save Notes as PDF</button>
+
+    <h3 class="section-h">Continue Learning</h3>
+    <div class="resource-grid">
+      <div class="resource-card">
+        <h4>📚 Books</h4>
+        <ul>
+          <li>"Fluent Python" — Luciano Ramalho</li>
+          <li>"Python Object-Oriented Programming" — Steven Lott & Dusty Phillips</li>
+          <li>"Clean Code" — Robert C. Martin (OOP design principles)</li>
+        </ul>
+      </div>
+      <div class="resource-card">
+        <h4>📖 Documentation</h4>
+        <ul>
+          <li>docs.python.org — Classes tutorial</li>
+          <li>docs.python.org — <code>abc</code> module reference</li>
+          <li>docs.python.org — Data model (dunder methods)</li>
+        </ul>
+      </div>
+      <div class="resource-card">
+        <h4>📄 Research & Writing</h4>
+        <ul>
+          <li>Liskov, B. "Data Abstraction and Hierarchy" (1987)</li>
+          <li>Cook, W. "On Understanding Data Abstraction, Revisited"</li>
+        </ul>
+      </div>
+      <div class="resource-card">
+        <h4>👥 Communities</h4>
+        <ul>
+          <li>r/learnpython, r/Python</li>
+          <li>Python Discord</li>
+          <li>Real Python community forum</li>
+        </ul>
+      </div>
+      <div class="resource-card">
+        <h4>💻 Practice Platforms</h4>
+        <ul>
+          <li>Exercism.org — Python track (OOP exercises)</li>
+          <li>LeetCode / HackerRank — design-pattern problems</li>
+          <li>CodeWars — kata katas tagged "OOP"</li>
+        </ul>
+      </div>
+      <div class="resource-card">
+        <h4>🔍 Search Keywords</h4>
+        <div>
+          <span class="keyword-chip">python dunder methods</span>
+          <span class="keyword-chip">python property decorator</span>
+          <span class="keyword-chip">python abc abstractmethod</span>
+          <span class="keyword-chip">python MRO method resolution order</span>
+          <span class="keyword-chip">python composition vs inheritance</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="section-h">Additional AI Prompts For Further Learning</h3>
+    <div class="card">
+      <ul style="padding-left:20px;">
+        <li>"Explain composition vs inheritance in Python with a real-world refactoring example."</li>
+        <li>"Show me Python's method resolution order (MRO) with a multiple-inheritance diamond example."</li>
+        <li>"Walk me through building a small plugin system in Python using ABCs."</li>
+        <li>"Compare Python dataclasses to writing a class by hand — when should I use each?"</li>
+      </ul>
+    </div>
+
+    <div class="widget" style="text-align:center;margin-top:30px;">
+      <div id="final-badge" style="font-size:40px;">🏆</div>
+      <div style="font-family:var(--mono);color:var(--yellow);font-size:18px;margin-top:6px;" id="final-score-text">Complete all module quizzes to see your final mastery score.</div>
+    </div>
+
+    <footer>Interactive Learning Studio · Python OOP · Built for hands-on mastery.</footer>
+  </div>
+</section>
+
+<script>
+/* ================= STATE ================= */
+const state = { unlocked:[1], scores:{}, current:1 };
+
+/* ================= QUIZ DATA ================= */
+const quizzes = {
+  1:[
+    {q:"What is the relationship between a class and an object?",
+     opts:["A class is one specific object","An object is an instance created from a class blueprint","They are exactly the same thing","A class can only ever create one object"],
+     correct:1,
+     exp:"A class defines the structure/behavior; an object is a concrete instance built from that blueprint. You can create many objects from one class."},
+    {q:"What does `self` refer to inside a method?",
+     opts:["The class itself, not any object","A global variable","The specific object the method was called on","Nothing — it's optional syntax"],
+     correct:2,
+     exp:"self is automatically bound to the instance the method was called on, e.g. rex.bark() passes rex as self."},
+    {q:"Which best describes a class attribute?",
+     opts:["Unique to each instance","Shared across all instances unless overridden","Only usable inside __init__","Automatically private"],
+     correct:1,
+     exp:"Class attributes live on the class itself and are shared by every instance unless an instance sets its own attribute of the same name."},
+    {q:"Why is __init__ useful?",
+     opts:["It deletes objects when done","It runs automatically to set up a new object's initial state","It's required for all Python files","It replaces the need for methods"],
+     correct:1,
+     exp:"__init__ is the constructor — it runs automatically when an object is created, typically to assign initial instance attributes."}
+  ],
+  2:[
+    {q:"In Python, what does a single leading underscore (`_name`) signal?",
+     opts:["Truly private, enforced by the interpreter","A convention meaning 'internal use', not enforced","A syntax error","A class attribute"],
+     correct:1,
+     exp:"A single underscore is purely a convention telling other developers 'treat this as internal' — Python does not block access to it."},
+    {q:"What does Python do with `self.__balance` (double underscore)?",
+     opts:["Nothing special","Deletes it after use","Name-mangles it to _ClassName__balance","Makes it a class attribute"],
+     correct:2,
+     exp:"Double-underscore attributes are name-mangled to _ClassName__name, which discourages accidental access but doesn't make it impossible."},
+    {q:"What is the main benefit of using @property over a public attribute?",
+     opts:["It's faster at runtime","It allows validation/logic to run while keeping attribute-style syntax","It makes the attribute private automatically","It's required by Python syntax rules"],
+     correct:1,
+     exp:"@property lets you run code (like validation) on get/set while the caller still writes obj.balance = value as if it were a plain attribute."},
+    {q:"Which real-world analogy best fits encapsulation?",
+     opts:["A cookie cutter and cookies","A vending machine hiding its internal cash box behind a simple interface","A company org chart","A universal remote control"],
+     correct:1,
+     exp:"Encapsulation is about exposing a controlled public interface while protecting internal state — like a vending machine's buttons vs its internal cash box."}
+  ],
+  3:[
+    {q:"What relationship does inheritance model?",
+     opts:["'has-a'","'is-a'","'uses-a'","'not-a'"],
+     correct:1,
+     exp:"Inheritance models 'is-a' relationships — a Dog is an Animal, a Manager is an Employee."},
+    {q:"What does calling `super().__init__(...)` typically do?",
+     opts:["Deletes the parent class","Calls the parent class's constructor to reuse its setup logic","Creates a new unrelated class","Is only valid in Java, not Python"],
+     correct:1,
+     exp:"super() gives access to the parent class's methods, letting a subclass reuse and extend rather than duplicate the parent's logic."},
+    {q:"If a subclass overrides a method, what happens to the parent's version?",
+     opts:["It's permanently deleted","It still exists and can be called via super()","It automatically runs first every time","It becomes private"],
+     correct:1,
+     exp:"Overriding just changes what's called by default on the subclass — the parent version remains accessible through super()."},
+    {q:"What resolves which method runs when multiple parent classes define the same method (multiple inheritance)?",
+     opts:["Alphabetical order of class names","Method Resolution Order (MRO)","Whichever class was defined first in the file, always","Python raises an error automatically"],
+     correct:1,
+     exp:"Python uses the C3 linearization algorithm to compute a consistent Method Resolution Order (MRO) for multiple inheritance."}
+  ],
+  4:[
+    {q:"What is polymorphism, in practice?",
+     opts:["Having many unrelated classes","Calling the same method name on different object types and getting type-appropriate behavior","Making all attributes private","Deleting unused methods"],
+     correct:1,
+     exp:"Polymorphism means the same method call works across different classes, each supplying its own appropriate implementation."},
+    {q:"What does an abstract method (via @abstractmethod) enforce?",
+     opts:["Nothing, it's just documentation","Subclasses must implement it or they cannot be instantiated","It runs automatically in the parent class","It makes a method private"],
+     correct:1,
+     exp:"@abstractmethod on an ABC-based class prevents instantiating any subclass that hasn't provided a concrete implementation."},
+    {q:"What triggers a class's `__str__` method?",
+     opts:["Calling print(obj) or str(obj)","Calling len(obj)","Adding two objects","Comparing objects with =="],
+     correct:0,
+     exp:"__str__ defines the readable string representation used by print() and str()."},
+    {q:"What is 'duck typing'?",
+     opts:["A requirement that classes inherit from a common ancestor","Caring about whether an object has the right behavior/methods rather than its exact type","A Python syntax error","A dunder method"],
+     correct:1,
+     exp:"Duck typing: 'if it walks like a duck and quacks like a duck' — Python cares about behavior (methods present), not declared inheritance."}
+  ]
+};
+
+/* ================= BUILD NAV DOTS ================= */
+const navNames = {1:"1 · Basics",2:"2 · Encapsulation",3:"3 · Inheritance",4:"4 · Polymorphism",5:"Finale"};
+function renderNav(){
+  const nav = document.getElementById('module-nav');
+  nav.innerHTML='';
+  for(let i=1;i<=5;i++){
+    const d=document.createElement('div');
+    d.className='nav-dot '+(state.unlocked.includes(i)?'unlocked':'locked')+(state.current===i?' active':'')+(state.scores[i]!==undefined?' done':'');
+    d.textContent = navNames[i] + (state.scores[i]!==undefined?' ✓':'');
+    d.onclick=()=>{ if(state.unlocked.includes(i)) goToModule(i); };
+    nav.appendChild(d);
+  }
+}
+
+/* ================= BUILD QUIZZES ================= */
+function buildQuiz(modNum){
+  const body = document.getElementById('quiz-'+modNum+'-body');
+  body.innerHTML='';
+  quizzes[modNum].forEach((item,qi)=>{
+    const block=document.createElement('div');
+    block.className='q-block';
+    block.innerHTML = `<div class="q-text">${qi+1}. ${item.q}</div>
+      <div class="q-options" data-q="${qi}">
+        ${item.opts.map((o,oi)=>`<div class="q-opt" data-o="${oi}">${o}</div>`).join('')}
+      </div>
+      <div class="q-explain" id="exp-${modNum}-${qi}"></div>`;
+    body.appendChild(block);
+    block.querySelectorAll('.q-opt').forEach(opt=>{
+      opt.onclick=()=>{
+        block.querySelectorAll('.q-opt').forEach(o=>o.classList.remove('selected'));
+        opt.classList.add('selected');
+      };
+    });
+  });
+}
+for(let m=1;m<=4;m++) buildQuiz(m);
+
+function submitQuiz(modNum){
+  const body = document.getElementById('quiz-'+modNum+'-body');
+  const blocks = body.querySelectorAll('.q-block');
+  let score=0;
+  blocks.forEach((block,qi)=>{
+    const item = quizzes[modNum][qi];
+    const opts = block.querySelectorAll('.q-opt');
+    const selected = block.querySelector('.q-opt.selected');
+    const selIdx = selected ? parseInt(selected.dataset.o) : -1;
+    opts.forEach((opt,oi)=>{
+      opt.style.pointerEvents='none';
+      if(oi===item.correct) opt.classList.add('correct');
+      else if(oi===selIdx) opt.classList.add('incorrect');
+    });
+    if(selIdx===item.correct) score++;
+    const exp=document.getElementById('exp-'+modNum+'-'+qi);
+    exp.textContent = (selIdx===item.correct?'✅ Correct. ':'❌ Not quite. ') + item.exp;
+    exp.classList.add('show');
+  });
+  document.getElementById('quiz-submit-'+modNum).style.display='none';
+  state.scores[modNum]=score;
+  const pct = Math.round(score/4*100);
+  const resultBox=document.getElementById('quiz-result-'+modNum);
+  document.getElementById('quiz-score-'+modNum).textContent = score+'/4 ('+pct+'%)';
+  const msgs = pct===100?'🌟 Perfect! You have fully mastered this module.':
+               pct>=75?'👍 Great work — solid understanding.':
+               pct>=50?'🙂 Decent grasp — consider rereading the misconceptions above.':
+               '🔁 Worth a review before moving on — reread the module content.';
+  document.getElementById('quiz-msg-'+modNum).textContent = msgs;
+  resultBox.classList.add('show');
+  if(modNum+1<=5 && !state.unlocked.includes(modNum+1)) state.unlocked.push(modNum+1);
+  updateProgress();
+  renderNav();
+}
+
+/* ================= MODULE NAVIGATION ================= */
+function goToModule(n){
+  document.querySelectorAll('.module').forEach(m=>m.classList.remove('visible'));
+  document.getElementById('mod-'+n).classList.add('visible');
+  state.current=n;
+  renderNav();
+  document.getElementById('mod-'+n).scrollIntoView({behavior:'smooth'});
+  if(n===5) updateFinalScore();
+}
+document.getElementById('mod-1').classList.add('visible');
+
+function updateProgress(){
+  const totalQuestions = 16;
+  let answered=0;
+  Object.values(state.scores).forEach(()=>{answered+=4;});
+  const pct = Math.round(answered/totalQuestions*100);
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('progress-pct').textContent=pct+'%';
+}
+
+function updateFinalScore(){
+  const done = Object.keys(state.scores).length;
+  if(done<4){
+    document.getElementById('final-score-text').textContent = `Complete all module quizzes to see your final mastery score (${done}/4 done).`;
+    document.getElementById('final-badge').textContent='📘';
+    return;
+  }
+  const total = Object.values(state.scores).reduce((a,b)=>a+b,0);
+  const pct = Math.round(total/16*100);
+  let badge='🥉', level='Practitioner';
+  if(pct===100){badge='🏆';level='OOP Master';}
+  else if(pct>=85){badge='🥇';level='Architect';}
+  else if(pct>=70){badge='🥈';level='Practitioner';}
+  else {badge='🥉';level='Novice';}
+  document.getElementById('final-badge').textContent=badge;
+  document.getElementById('final-score-text').textContent = `Final score: ${total}/16 (${pct}%) — Mastery level: ${level}`;
+}
+
+renderNav();
+
+/* ================= WIDGETS ================= */
+function m1build(){
+  const name=document.getElementById('m1-name').value||'Buddy';
+  const breed=document.getElementById('m1-breed').value||'Mixed';
+  document.getElementById('m1-out').textContent =
+`>>> rex = Dog("${name}", "${breed}")
+>>> rex.bark()
+'${name} says Woof!'
+>>> rex.name, rex.breed
+('${name}', '${breed}')`;
+}
+
+let m2balance=100;
+function m2act(kind){
+  const amt=parseFloat(document.getElementById('m2-amount').value)||0;
+  const disp=document.getElementById('m2-balance-display');
+  if(kind==='deposit'){
+    if(amt<=0){disp.textContent='❌ ValueError: deposit amount must be positive';return;}
+    m2balance+=amt;
+    disp.textContent='Balance: ₹'+m2balance+'  (deposited ₹'+amt+')';
+  } else {
+    if(amt>m2balance){disp.textContent='❌ ValueError: insufficient funds';return;}
+    m2balance-=amt;
+    disp.textContent='Balance: ₹'+m2balance+'  (withdrew ₹'+amt+')';
+  }
+}
+
+function m3demo(){
+  document.getElementById('m3-out').textContent =
+`>>> for a in [Dog("Rex"), Cat("Milo"), Puppy("Fifi", 3)]:
+...     print(a.make_sound())
+Rex says Woof!
+Milo says Meow!
+Fifi says Woof! (but it's more of a yip)`;
+}
+
+function m4add(){
+  const a=document.getElementById('m4-a').value.split(',').map(Number);
+  const b=document.getElementById('m4-b').value.split(',').map(Number);
+  if(a.length<2||b.length<2||a.some(isNaN)||b.some(isNaN)){
+    document.getElementById('m4-out').textContent='Enter points as x,y e.g. 1,2';
+    return;
+  }
+  const rx=a[0]+b[0], ry=a[1]+b[1];
+  document.getElementById('m4-out').textContent =
+`>>> p1 = Point(${a[0]}, ${a[1]})
+>>> p2 = Point(${b[0]}, ${b[1]})
+>>> print(p1 + p2)
+(${rx}, ${ry})`;
+}
+
+function checkChallenge(){
+  const val = document.getElementById('challenge-input').value;
+  const out = document.getElementById('challenge-check');
+  out.classList.add('show');
+  const checks = [
+    {label:'Defines a class', pass:/class\s+\w+/.test(val)},
+    {label:'Uses inheritance (Manager(Employee))', pass:/class\s+\w+\s*\(\s*\w+\s*\)/.test(val)},
+    {label:'Uses super()', pass:/super\s*\(/.test(val)},
+    {label:'Defines __str__', pass:/__str__/.test(val)},
+    {label:'Encapsulates salary (e.g. __salary)', pass:/__salary/.test(val)}
+  ];
+  out.innerHTML = checks.map(c=>`<div style="color:${c.pass?'var(--green)':'var(--text-dim)'}">${c.pass?'✅':'⬜'} ${c.label}</div>`).join('')
+    + `<div style="margin-top:8px;color:var(--text-dim);">This is a self-check heuristic, not a real interpreter — compare your structure against the cheat sheet above.</div>`;
+}
+</script>
+</body>
+</html>
