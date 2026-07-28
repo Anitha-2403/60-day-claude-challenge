@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Workflow Architect — Full-Stack Portfolio Build</title>
+<style>
+:root{
+  --bg:#0a1120;
+  --bg-2:#0d1729;
+  --panel:#101d33;
+  --panel-glass:rgba(21,38,64,0.55);
+  --line:rgba(126,158,200,0.18);
+  --line-strong:rgba(126,158,200,0.35);
+  --cyan:#3fe0c8;
+  --cyan-dim:rgba(63,224,200,0.15);
+  --amber:#f2a75e;
+  --amber-dim:rgba(242,167,94,0.15);
+  --text:#e8eff8;
+  --muted:#8ca0bd;
+  --muted-2:#5f7290;
+  --danger:#f2705e;
+  --good:#7ee08a;
+  --radius:14px;
+  --serif:Georgia,'Iowan Old Style','Palatino Linotype',Palatino,serif;
+  --mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(63,224,200,0.06), transparent 45%),
+    radial-gradient(circle at 85% 20%, rgba(242,167,94,0.05), transparent 40%),
+    repeating-linear-gradient(0deg, rgba(126,158,200,0.045) 0px, rgba(126,158,200,0.045) 1px, transparent 1px, transparent 32px),
+    repeating-linear-gradient(90deg, rgba(126,158,200,0.045) 0px, rgba(126,158,200,0.045) 1px, transparent 1px, transparent 32px),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--cyan-dim);color:var(--cyan);}
+::-webkit-scrollbar{width:10px;height:10px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:8px;}
+
+.topbar{
+  position:sticky;top:0;z-index:60;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 28px;
+  background:rgba(10,17,32,0.82);
+  backdrop-filter:blur(14px) saturate(140%);
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-mark{
+  width:34px;height:34px;border:1.5px solid var(--cyan);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;position:relative;
+  background:linear-gradient(135deg,var(--cyan-dim),transparent);
+}
+.brand-mark svg{width:18px;height:18px;stroke:var(--cyan);}
+.brand-text .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;}
+.brand-text h1{margin:0;font-family:var(--serif);font-size:19px;font-weight:400;letter-spacing:.01em;}
+.brand-text h1 em{font-style:normal;color:var(--cyan);}
+.top-actions{display:flex;gap:10px;align-items:center;}
+.icon-btn{
+  width:38px;height:38px;border-radius:9px;border:1px solid var(--line);
+  background:rgba(255,255,255,0.02);color:var(--muted);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:.2s ease;
+}
+.icon-btn:hover{border-color:var(--cyan);color:var(--cyan);background:var(--cyan-dim);}
+.icon-btn svg{width:17px;height:17px;}
+
+.shell{display:grid;grid-template-columns:270px 1fr;min-height:100vh;}
+@media (max-width:900px){.shell{grid-template-columns:1fr;}}
+
+.sidebar{
+  border-right:1px solid var(--line);
+  padding:22px 16px 40px;
+  position:sticky;top:63px;align-self:start;height:calc(100vh - 63px);
+  overflow-y:auto;
+}
+@media (max-width:900px){.sidebar{position:relative;top:0;height:auto;border-right:none;border-bottom:1px solid var(--line);}}
+.side-label{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--muted-2);text-transform:uppercase;padding:0 10px;margin:18px 0 8px;}
+.side-label:first-child{margin-top:0;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 10px;border-radius:9px;cursor:pointer;
+  color:var(--muted);font-size:13.5px;position:relative;
+  transition:.18s ease;border:1px solid transparent;
+}
+.nav-item:hover{background:rgba(255,255,255,0.03);color:var(--text);}
+.nav-item.active{background:var(--cyan-dim);color:var(--cyan);border-color:rgba(63,224,200,0.3);}
+.nav-num{font-family:var(--mono);font-size:10px;color:var(--muted-2);width:16px;flex-shrink:0;}
+.nav-item.active .nav-num{color:var(--cyan);}
+.nav-check{
+  margin-left:auto;width:15px;height:15px;border-radius:50%;border:1.5px solid var(--line-strong);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+}
+.nav-check.done{background:var(--good);border-color:var(--good);}
+.nav-check.done svg{width:9px;height:9px;stroke:#0a1120;}
+
+.progress-widget{margin:16px 10px 6px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--panel-glass);}
+.progress-widget .pw-top{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-bottom:8px;}
+.progress-bar{height:6px;border-radius:4px;background:rgba(255,255,255,0.06);overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--amber));border-radius:4px;transition:width .5s ease;width:0%;}
+
+main{padding:32px 40px 100px;max-width:1100px;}
+@media (max-width:700px){main{padding:22px 16px 80px;}}
+
+.hero{margin-bottom:34px;}
+.hero .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--amber);text-transform:uppercase;margin-bottom:10px;}
+.hero h2{font-family:var(--serif);font-size:34px;font-weight:400;margin:0 0 12px;line-height:1.15;max-width:680px;}
+.hero p{color:var(--muted);max-width:620px;font-size:15px;margin:0 0 20px;}
+.hero-meta{display:flex;gap:22px;flex-wrap:wrap;}
+.hero-meta .item{font-family:var(--mono);font-size:11.5px;color:var(--muted);}
+.hero-meta .item b{color:var(--cyan);font-weight:600;}
+
+section.panel{
+  background:var(--panel-glass);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:26px 28px;
+  margin-bottom:22px;
+}
+h3.panel-title{
+  font-family:var(--serif);font-size:20px;font-weight:400;margin:0 0 4px;
+  display:flex;align-items:center;gap:10px;
+}
+h3.panel-title .tag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--muted-2);border:1px solid var(--line);padding:2px 8px;border-radius:20px;text-transform:uppercase;}
+.panel-sub{color:var(--muted);font-size:13px;margin:0 0 18px;}
+
+.diagram-wrap{width:100%;overflow-x:auto;padding:6px 0;}
+.diagram-wrap svg{display:block;min-width:760px;}
+.flow-node rect{fill:var(--panel);stroke:var(--line-strong);stroke-width:1;}
+.flow-node.active rect{stroke:var(--cyan);}
+.flow-node text{fill:var(--text);font-family:var(--sans);}
+.flow-node .lbl-num{fill:var(--muted-2);font-family:var(--mono);}
+.flow-edge{stroke:var(--muted-2);stroke-width:1.4;fill:none;stroke-dasharray:5 4;}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+@media (max-width:760px){.grid-2,.grid-3{grid-template-columns:1fr;}}
+
+.mini-card{border:1px solid var(--line);border-radius:11px;padding:16px 17px;background:rgba(255,255,255,0.015);}
+.mini-card h4{margin:0 0 8px;font-size:13px;letter-spacing:.02em;display:flex;align-items:center;gap:7px;}
+.mini-card h4 .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);flex-shrink:0;}
+.mini-card ul{margin:0;padding-left:18px;font-size:13px;color:var(--muted);}
+.mini-card li{margin-bottom:5px;}
+.mini-card p{margin:0;font-size:13px;color:var(--muted);}
+
+.tool-card{
+  border:1px solid var(--line);border-radius:12px;padding:16px 17px;
+  background:rgba(255,255,255,0.015);position:relative;overflow:hidden;
+}
+.tool-card.best{border-color:rgba(63,224,200,0.45);background:linear-gradient(180deg,var(--cyan-dim),transparent 60%);}
+.tool-card .best-badge{
+  position:absolute;top:0;right:0;background:var(--cyan);color:#06251f;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;padding:3px 10px 3px 12px;
+  border-bottom-left-radius:9px;text-transform:uppercase;font-weight:700;
+}
+.tool-card h4{margin:0 0 4px;font-size:14.5px;}
+.tool-card .why{font-size:12.5px;color:var(--muted);margin:6px 0 10px;}
+.tool-card .meta-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10.5px;color:var(--muted-2);border-top:1px dashed var(--line);padding-top:8px;margin-top:6px;}
+.tool-card .meta-row b{color:var(--amber);}
+
+.prompt-item{
+  border:1px solid var(--line);border-radius:10px;padding:13px 15px;margin-bottom:10px;
+  background:rgba(0,0,0,0.15);position:relative;
+}
+.prompt-item .pl-label{font-family:var(--mono);font-size:10px;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.prompt-item code{
+  display:block;font-family:var(--mono);font-size:12.5px;color:var(--text);
+  white-space:pre-wrap;line-height:1.55;padding-right:70px;
+}
+.copy-btn{
+  position:absolute;top:10px;right:10px;background:rgba(255,255,255,0.04);
+  border:1px solid var(--line);color:var(--muted);font-family:var(--mono);
+  font-size:10px;padding:4px 9px;border-radius:6px;cursor:pointer;transition:.2s;
+}
+.copy-btn:hover{color:var(--cyan);border-color:var(--cyan);}
+.copy-btn.copied{color:var(--good);border-color:var(--good);}
+
+.task-row{display:flex;align-items:flex-start;gap:11px;padding:9px 4px;border-bottom:1px solid var(--line);}
+.task-row:last-child{border-bottom:none;}
+.task-check{
+  width:18px;height:18px;border-radius:5px;border:1.5px solid var(--line-strong);
+  flex-shrink:0;cursor:pointer;margin-top:1px;display:flex;align-items:center;justify-content:center;
+  transition:.15s;
+}
+.task-check.checked{background:var(--cyan);border-color:var(--cyan);}
+.task-check.checked svg{width:11px;height:11px;stroke:#06251f;}
+.task-text{font-size:13.5px;color:var(--text);cursor:pointer;}
+.task-row.done .task-text{color:var(--muted-2);text-decoration:line-through;}
+
+.two-col-lists{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media (max-width:700px){.two-col-lists{grid-template-columns:1fr;}}
+.list-block{border-radius:11px;padding:16px 17px;border:1px solid var(--line);}
+.list-block.good{border-color:rgba(126,224,138,0.3);background:rgba(126,224,138,0.05);}
+.list-block.bad{border-color:rgba(242,112,94,0.3);background:rgba(242,112,94,0.05);}
+.list-block h4{margin:0 0 8px;font-size:12.5px;text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono);}
+.list-block.good h4{color:var(--good);}
+.list-block.bad h4{color:var(--danger);}
+.list-block ul{margin:0;padding-left:16px;font-size:13px;color:var(--muted);}
+.list-block li{margin-bottom:6px;}
+
+.dtree{border:1px solid var(--line);border-radius:12px;padding:20px;background:rgba(0,0,0,0.12);}
+.dtree .q{font-family:var(--mono);font-size:12px;color:var(--amber);margin-bottom:10px;}
+.dtree .options{display:flex;gap:10px;flex-wrap:wrap;}
+.dtree button.opt{
+  background:rgba(255,255,255,0.03);border:1px solid var(--line);color:var(--text);
+  padding:8px 14px;border-radius:8px;font-size:13px;cursor:pointer;transition:.18s;
+}
+.dtree button.opt:hover{border-color:var(--cyan);color:var(--cyan);}
+.dtree .result{margin-top:14px;padding:14px;border-left:2px solid var(--cyan);background:var(--cyan-dim);border-radius:0 8px 8px 0;font-size:13.5px;display:none;}
+.dtree .result.show{display:block;}
+.dtree .breadcrumb{font-family:var(--mono);font-size:10.5px;color:var(--muted-2);margin-bottom:12px;min-height:14px;}
+
+textarea.notes-box{
+  width:100%;min-height:110px;background:rgba(0,0,0,0.2);border:1px solid var(--line);
+  border-radius:10px;color:var(--text);padding:12px 14px;font-family:var(--sans);font-size:13.5px;
+  resize:vertical;
+}
+textarea.notes-box:focus{outline:none;border-color:var(--cyan);}
+.bookmark-row{display:flex;gap:8px;margin-top:10px;}
+.bookmark-row input{
+  flex:1;background:rgba(0,0,0,0.2);border:1px solid var(--line);border-radius:8px;color:var(--text);
+  padding:9px 12px;font-size:13px;
+}
+.bookmark-row input:focus{outline:none;border-color:var(--cyan);}
+.btn-small{background:var(--cyan);color:#06251f;border:none;border-radius:8px;padding:9px 15px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--mono);}
+.bookmark-list{list-style:none;padding:0;margin:12px 0 0;}
+.bookmark-list li{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border:1px solid var(--line);border-radius:8px;margin-bottom:7px;font-size:13px;}
+.bookmark-list .rm{cursor:pointer;color:var(--muted-2);font-family:var(--mono);font-size:11px;}
+.bookmark-list .rm:hover{color:var(--danger);}
+
+.stage-nav{display:flex;justify-content:space-between;margin-top:8px;gap:14px;}
+.stage-nav button{
+  flex:1;background:var(--panel-glass);border:1px solid var(--line);color:var(--text);
+  padding:14px 18px;border-radius:11px;cursor:pointer;text-align:left;transition:.2s;
+}
+.stage-nav button:hover{border-color:var(--cyan);}
+.stage-nav button .dir{font-family:var(--mono);font-size:9.5px;color:var(--muted-2);text-transform:uppercase;letter-spacing:.1em;}
+.stage-nav button .lbl{font-size:14px;margin-top:3px;}
+.stage-nav button.next{text-align:right;}
+
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
+.chip{font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--line);color:var(--muted);}
+.chip.amber{border-color:rgba(242,167,94,0.4);color:var(--amber);}
+.chip.cyan{border-color:rgba(63,224,200,0.4);color:var(--cyan);}
+
+.stack-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+.stack-table th{text-align:left;font-family:var(--mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-2);padding:8px 10px;border-bottom:1px solid var(--line-strong);}
+.stack-table td{padding:10px 10px;border-bottom:1px solid var(--line);color:var(--text);}
+.stack-table td.dim{color:var(--muted);}
+
+footer.credits{text-align:center;padding:40px 0 20px;color:var(--muted-2);font-family:var(--mono);font-size:11px;}
+
+@media print{
+  .sidebar,.topbar,.stage-nav,.copy-btn,.icon-btn,.dtree button.opt{display:none !important;}
+  body{background:#fff;color:#111;}
+  section.panel{border:1px solid #ccc;background:#fff;break-inside:avoid;}
+  .shell{display:block;}
+  main{max-width:100%;padding:0;}
+}
+
+.fade-in{animation:fadeIn .45s ease both;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+#toast{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--panel);border:1px solid var(--cyan);color:var(--cyan);
+  padding:11px 20px;border-radius:10px;font-family:var(--mono);font-size:12.5px;
+  opacity:0;pointer-events:none;transition:.3s ease;z-index:200;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M4 12h4l2-7 4 14 2-7h4"/></svg></div>
+    <div class="brand-text">
+      <div class="eyebrow">AI Workflow Architect</div>
+      <h1>Full-Stack <em>Portfolio</em> Build Plan</h1>
+    </div>
+  </div>
+  <div class="top-actions">
+    <div class="icon-btn" id="printBtn" title="Print / Export"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg></div>
+    <div class="icon-btn" id="resetBtn" title="Reset progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 12a9 9 0 1 0 3-6.7M3 5v5h5"/></svg></div>
+  </div>
+</div>
+
+<div class="shell">
+  <nav class="sidebar" id="sidebar">
+    <div class="side-label">Workflow Stages</div>
+    <div id="navList"></div>
+    <div class="progress-widget">
+      <div class="pw-top"><span>OVERALL PROGRESS</span><span id="pwPct">0%</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="pwFill"></div></div>
+    </div>
+    <div class="side-label">Reference</div>
+    <div class="nav-item" onclick="scrollToId('decision-tree')"><span class="nav-num">&#9670;</span> Stack Decision Tree</div>
+    <div class="nav-item" onclick="scrollToId('tool-stack')"><span class="nav-num">&#9670;</span> Recommended AI Stack</div>
+    <div class="nav-item" onclick="scrollToId('notes-section')"><span class="nav-num">&#9670;</span> Notes &amp; Bookmarks</div>
+    <div class="nav-item" onclick="scrollToId('summary')"><span class="nav-num">&#9670;</span> Summary &amp; Resources</div>
+  </nav>
+
+  <main>
+    <div class="hero fade-in">
+      <div class="eyebrow">Software Development &rarr; Full-Stack &rarr; Portfolio Project</div>
+      <h2>Ship a personal portfolio site, end to end — with the right AI tool at every step.</h2>
+      <p>Recommended stack: <strong>Next.js (App Router) + TypeScript + Tailwind CSS</strong> on the frontend, a lightweight <strong>Node/Next API routes</strong> backend, <strong>Postgres via Supabase/Neon</strong> for data (contact form, project CMS), and <strong>Vercel</strong> for deployment — the highest-leverage combo for a solo developer who wants speed, one deploy target, and strong AI-tool support.</p>
+      <div class="hero-meta">
+        <div class="item"><b>8</b> stages</div>
+        <div class="item"><b>~18–26 hrs</b> total effort</div>
+        <div class="item"><b>Solo</b> builder track</div>
+        <div class="item"><b>Beginner–Intermediate</b> skill level</div>
+      </div>
+    </div>
+
+    <section class="panel fade-in" id="overview-diagram">
+      <h3 class="panel-title">Workflow Map <span class="tag">interactive</span></h3>
+      <p class="panel-sub">Click a node to jump to that stage.</p>
+      <div class="diagram-wrap">
+        <svg id="flowSvg" viewBox="0 0 1500 220" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+    </section>
+
+    <div id="stagesRoot"></div>
+
+    <section class="panel fade-in" id="decision-tree">
+      <h3 class="panel-title">Decision Tree <span class="tag">stack &amp; scope</span></h3>
+      <p class="panel-sub">Answer a couple of questions to confirm your build path.</p>
+      <div class="dtree" id="dtree">
+        <div class="breadcrumb" id="dtBreadcrumb"></div>
+        <div id="dtStep"></div>
+      </div>
+    </section>
+
+    <section class="panel fade-in" id="tool-stack">
+      <h3 class="panel-title">Recommended AI Stack</h3>
+      <p class="panel-sub">The core toolkit worth paying for across this entire build.</p>
+      <table class="stack-table">
+        <thead><tr><th>Role</th><th>Tool</th><th>Use it for</th><th>Cost tier</th></tr></thead>
+        <tbody id="stackBody"></tbody>
+      </table>
+    </section>
+
+    <section class="panel fade-in" id="notes-section">
+      <h3 class="panel-title">Notes &amp; Bookmarks</h3>
+      <p class="panel-sub">Saved locally in your browser — nothing leaves this page.</p>
+      <div class="grid-2">
+        <div>
+          <h4 style="margin:0 0 8px;font-size:13px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;">Working Notes</h4>
+          <textarea class="notes-box" id="notesBox" placeholder="Jot ideas, blockers, or decisions here..."></textarea>
+        </div>
+        <div>
+          <h4 style="margin:0 0 8px;font-size:13px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;">Bookmarks</h4>
+          <div class="bookmark-row">
+            <input type="text" id="bmInput" placeholder="Paste a link or reference note...">
+            <button class="btn-small" onclick="addBookmark()">Save</button>
+          </div>
+          <ul class="bookmark-list" id="bmList"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel fade-in" id="summary">
+      <h3 class="panel-title">Workflow Summary</h3>
+      <p class="panel-sub">You'll go from a blank repo to a live, indexed portfolio at a custom domain, with a working contact flow and a system for adding new projects in minutes.</p>
+      <div class="two-col-lists">
+        <div class="list-block good">
+          <h4>What "done" looks like</h4>
+          <ul>
+            <li>Live site on a custom domain, Lighthouse 90+ across the board</li>
+            <li>3–6 case-study project pages with real detail, not just screenshots</li>
+            <li>Working contact form with spam protection and email delivery</li>
+            <li>Analytics + search console verified and collecting data</li>
+            <li>Content update takes &lt; 10 minutes via CMS or MDX file</li>
+          </ul>
+        </div>
+        <div class="list-block bad">
+          <h4>Scope traps to avoid</h4>
+          <ul>
+            <li>Building a custom CMS admin panel instead of using MDX/headless CMS</li>
+            <li>Over-animating the homepage before any case studies exist</li>
+            <li>Picking a novel stack to "learn" instead of shipping — do that separately</li>
+            <li>Writing project copy last, under deadline pressure</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:18px;">
+        <div class="mini-card">
+          <h4><span class="dot"></span>Learning Resources</h4>
+          <ul>
+            <li>Next.js official docs — App Router tutorial</li>
+            <li>web.dev — Core Web Vitals &amp; performance guides</li>
+            <li>Tailwind CSS docs — utility-first fundamentals</li>
+            <li>Supabase docs — auth &amp; Postgres quickstart</li>
+            <li>Josh Comeau / Kent C. Dodds blogs — React &amp; UI craft</li>
+          </ul>
+        </div>
+        <div class="mini-card">
+          <h4><span class="dot"></span>Communities</h4>
+          <ul>
+            <li>r/webdev, r/nextjs, r/SideProject</li>
+            <li>Vercel &amp; Supabase Discord servers</li>
+            <li>Indie Hackers — "Show IH" project feedback threads</li>
+            <li>Frontend Masters / Dev.to discussion threads</li>
+            <li>Local or virtual portfolio-review meetups</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:14px;">
+        <div class="mini-card">
+          <h4><span class="dot"></span>Search Keywords</h4>
+          <div class="chip-row">
+            <span class="chip">next.js portfolio starter</span>
+            <span class="chip">developer portfolio case study structure</span>
+            <span class="chip">tailwind design tokens</span>
+            <span class="chip">vercel custom domain setup</span>
+            <span class="chip">core web vitals fix checklist</span>
+            <span class="chip">mdx blog next.js</span>
+          </div>
+        </div>
+        <div class="mini-card">
+          <h4><span class="dot"></span>Future Automation Opportunities</h4>
+          <ul>
+            <li>Auto-generate OG images per project via API route + Satori</li>
+            <li>GitHub Action to run Lighthouse CI on every deploy</li>
+            <li>AI-drafted changelog/blog post from commit history monthly</li>
+            <li>Auto-post new case studies to LinkedIn/X via a scheduled script</li>
+            <li>Uptime + broken-link monitor with weekly email digest</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <footer class="credits">AI WORKFLOW ARCHITECT — GENERATED WORKFLOW GUIDE — SAVE / PRINT FOR OFFLINE USE</footer>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const STAGES = [
+{
+  id:"discovery", title:"Discovery & Planning", time:"2–3 hrs",
+  objectives:["Define the site's single goal (get interviews / freelance leads / credibility) and audience","Pick 3–6 projects worth featuring and the story each one tells","Lock the tech stack and information architecture"],
+  tasks:["Write a one-line positioning statement","List every project you could feature, then cut to the best 3–6","Sketch sitemap: Home, Projects, About, Contact (+ optional Blog)","Decide stack: Next.js + TypeScript + Tailwind + Supabase + Vercel","Draft a rough content outline for each project page"],
+  tools:[
+    {name:"Claude", why:"Best for structured planning conversations — turning a messy list of projects into a prioritized sitemap and content outline.", alt:"ChatGPT", best:true, price:"Free–$20/mo"},
+    {name:"Notion AI", why:"Keeps planning docs, project inventory, and content outlines in one linked workspace as the plan evolves.", alt:"Obsidian + plugins", best:false, price:"$10/mo"},
+    {name:"Whimsical AI", why:"Turns a text sitemap description into a visual flow instantly, useful for sanity-checking IA.", alt:"Miro AI", best:false, price:"Free tier"}
+  ],
+  prompts:[
+    {label:"Positioning", text:"I'm a [your role, e.g. full-stack developer] with experience in [key skills]. Help me write a one-sentence portfolio positioning statement aimed at [target audience, e.g. startup hiring managers]. Give me 5 variations, ranked by clarity."},
+    {label:"Project prioritization", text:"Here are all the projects I could feature on my portfolio: [list projects with 1-line descriptions]. Help me pick the 4 strongest for a portfolio targeting [role/industry], and explain why each was chosen or cut."},
+    {label:"Sitemap", text:"Propose a sitemap and page-level content outline for a developer portfolio site with these sections: Home, Projects, About, Contact. My featured projects are: [list]. Keep it to what's essential — no bloat."}
+  ],
+  best:["Cut scope before you start building, not after","Write positioning first — it drives every later content decision","Pick projects that show range: one technical deep-dive, one UI-heavy, one product-thinking piece"],
+  mistakes:["Starting to code before deciding what story the site tells","Trying to feature every project you've ever built","Skipping audience definition and writing generic copy"],
+  outputs:["1-paragraph positioning statement","Prioritized project shortlist (3–6)","Sitemap + rough content outline"],
+  tips:"Time-box discovery to one sitting — a portfolio plan doesn't need a week of research."
+},
+{
+  id:"design", title:"Design & UI System", time:"3–4 hrs",
+  objectives:["Establish a small, coherent design system (type, color, spacing)","Produce wireframes for Home, Project detail, and About","Decide on a visual signature that reflects your work, not a template"],
+  tasks:["Choose 2 typefaces (display + body) and a 4–5 color palette","Wireframe the homepage hero and project grid","Design one project case-study template to reuse for all projects","Define spacing/radius/shadow tokens for consistency"],
+  tools:[
+    {name:"v0 by Vercel", why:"Generates production-ready React + Tailwind UI from a text prompt, matched to the exact stack you're deploying to Vercel.", alt:"Galileo AI", best:true, price:"Free–$20/mo"},
+    {name:"Figma + Figma AI", why:"Best for wireframing and refining layout decisions visually before writing code, especially the reusable project template.", alt:"Framer", best:false, price:"Free–$12/mo"},
+    {name:"Coolors / Khroma", why:"AI-assisted palette generation constrained to accessible contrast ratios.", alt:"Adobe Color", best:false, price:"Free"}
+  ],
+  prompts:[
+    {label:"UI generation", text:"Design a homepage hero section for a developer portfolio, dark theme, using a bold serif headline and a monospace accent for labels. Include a short intro, 3 stat highlights, and a CTA to view projects. Build in React + Tailwind."},
+    {label:"Design tokens", text:"Suggest a small design token system (5 colors, 2 fonts, spacing scale, border radius scale) for a portfolio site with a [minimal/technical/bold] aesthetic. Explain the reasoning behind each choice in one line."},
+    {label:"Case study template", text:"Design a reusable project case-study page template with sections: overview, problem, my role, process, outcome, tech stack, links. Keep it scannable for a recruiter skimming in under 60 seconds."}
+  ],
+  best:["Design the reusable project template before designing individual project pages","Constrain yourself to one accent color plus neutrals","Test the palette for contrast accessibility (4.5:1 minimum)"],
+  mistakes:["Designing every project page differently — kills scalability","Copying a trending template wholesale instead of adapting it to your work","Skipping mobile layout until after desktop is 'done'"],
+  outputs:["Design token sheet","2–3 key wireframes","One reusable case-study template (Figma or code)"],
+  tips:"Design mobile-first for the hero and project grid — most recruiter traffic from LinkedIn is mobile."
+},
+{
+  id:"frontend", title:"Frontend Build", time:"5–7 hrs",
+  objectives:["Scaffold the Next.js app and implement the design system","Build Home, Projects grid, Project detail, and About pages","Ensure responsive behavior and smooth, purposeful motion"],
+  tasks:["Scaffold with create-next-app (TypeScript, App Router, Tailwind)","Build shared layout: nav, footer, theme tokens as Tailwind config","Implement homepage sections from the wireframe","Build the project detail template and wire it to content data","Add subtle scroll/hover animations, respecting reduced-motion"],
+  tools:[
+    {name:"GitHub Copilot", why:"Fastest for scaffolding repetitive component structure and Tailwind class patterns directly in your editor.", alt:"Cursor", best:true, price:"$10/mo"},
+    {name:"Cursor", why:"Strong for multi-file refactors and chat-driven edits across the whole component tree, not just single-file completion.", alt:"Windsurf", best:false, price:"Free–$20/mo"},
+    {name:"Claude (in editor / chat)", why:"Best for reasoning through component architecture decisions and debugging tricky layout or state issues.", alt:"ChatGPT", best:false, price:"Free–$20/mo"}
+  ],
+  prompts:[
+    {label:"Scaffold component", text:"Build a responsive ProjectCard component in React + TypeScript + Tailwind. Props: title, summary, tags (string[]), image, href. Include a hover state that lifts the card slightly and reveals the tags. Respect prefers-reduced-motion."},
+    {label:"Layout", text:"Create a Next.js App Router layout.tsx with a sticky header (logo + 4 nav links), a footer with social links, and a dark theme using CSS variables. Keep it framework-idiomatic and accessible (semantic landmarks, focus states)."},
+    {label:"Debugging", text:"This Next.js component re-renders on every keystroke in an unrelated input and I don't know why. Here's the component: [paste code]. Walk me through likely causes and the fix."}
+  ],
+  best:["Componentize early: card, tag, section-header — reuse everywhere","Keep animation purposeful: one hero reveal, consistent hover states, nothing more","Commit in small, working increments"],
+  mistakes:["Hand-building things Tailwind/shadcn already solve well","Adding a state management library for a mostly-static site","Ignoring keyboard navigation and focus rings"],
+  outputs:["Working Next.js app locally","All core pages implemented and responsive","Component library documented in code (props typed)"],
+  tips:"Use AI to generate the first draft of a component, then hand-tune spacing and copy yourself — that's where sites stop looking templated."
+},
+{
+  id:"backend", title:"Backend, Data & Content", time:"3–4 hrs",
+  objectives:["Set up a lightweight content source for projects (MDX or headless CMS)","Implement the contact form with server-side handling and spam protection","Model any dynamic data needed (e.g., project metadata, view counts)"],
+  tasks:["Choose MDX-in-repo vs. headless CMS (Sanity/Contentful) based on how often content changes","Set up Supabase/Neon Postgres if storing form submissions or dynamic data","Build the contact API route with validation and rate limiting","Add honeypot or hCaptcha for spam protection","Wire email delivery (Resend/SendGrid) for form submissions"],
+  tools:[
+    {name:"Claude / ChatGPT", why:"Best for reasoning through data modeling decisions (MDX vs CMS vs DB) given your actual update frequency and skill level.", alt:"—", best:true, price:"Free–$20/mo"},
+    {name:"Supabase AI SQL Editor", why:"Generates and explains SQL/RLS policies in plain English, reducing backend setup friction for a solo dev.", alt:"Neon + Copilot", best:false, price:"Free tier generous"},
+    {name:"GitHub Copilot", why:"Speeds up writing the API route boilerplate: validation, error handling, email send logic.", alt:"Cursor", best:false, price:"$10/mo"}
+  ],
+  prompts:[
+    {label:"Data modeling", text:"I'm building a Next.js portfolio with 4–6 projects that I'll update a few times a year. Should I use MDX files in the repo or a headless CMS? Weigh both for my situation: solo developer, low update frequency, wants simplicity over flexibility."},
+    {label:"API route", text:"Write a Next.js App Router API route (route.ts) for a contact form: validate name/email/message with zod, rate-limit by IP, send via Resend, and return typed JSON responses for success and each error case."},
+    {label:"SQL/schema", text:"Write a Postgres schema for storing portfolio contact form submissions: id, name, email, message, created_at, and a boolean 'read' flag. Include a Supabase row-level security policy so only I can read them."}
+  ],
+  best:["Default to MDX-in-repo unless you truly need non-technical editors","Validate and sanitize all form input server-side, not just client-side","Rate-limit public API routes from day one"],
+  mistakes:["Standing up a full CMS + database for a site that changes twice a year","Trusting client-side validation alone on the contact form","Storing API keys in client-exposed environment variables"],
+  outputs:["Content source wired to project pages","Working contact API route with validation + spam protection","Emails arriving reliably in your inbox"],
+  tips:"Test the contact form with intentionally bad input (empty fields, huge payloads, script tags) before considering it done."
+},
+{
+  id:"seo", title:"Content, Copy & SEO", time:"2–3 hrs",
+  objectives:["Write final copy for every page — homepage, about, and each case study","Implement technical SEO basics and metadata","Prepare social preview (OG) images"],
+  tasks:["Draft and edit homepage and about copy in your own voice","Write each case study with problem → role → process → outcome structure","Add metadata, sitemap.xml, robots.txt, and OG image per page","Verify with Google Search Console after deploy"],
+  tools:[
+    {name:"Claude", why:"Best for drafting and tightening copy while preserving your voice — ask it to edit rather than generate from scratch for authenticity.", alt:"ChatGPT", best:true, price:"Free–$20/mo"},
+    {name:"Hemingway Editor", why:"Quick readability pass to catch overly dense sentences before publishing.", alt:"Grammarly", best:false, price:"Free"},
+    {name:"Satori (via API route)", why:"Auto-generates on-brand OG images per project instead of manual design work.", alt:"Manual Figma export", best:false, price:"Free (self-hosted)"}
+  ],
+  prompts:[
+    {label:"Case study copy", text:"Help me write a case study for this project: [describe project, your role, the problem, what you built, the outcome]. Structure: Overview (2 sentences), Problem, My Role, Process (3-4 steps), Outcome (with a concrete result if possible). Keep it honest and specific, not salesy."},
+    {label:"Editing pass", text:"Edit this About page draft for clarity and voice — keep it sounding like me, just tighter. Cut anything generic or resume-speak: [paste draft]."},
+    {label:"Metadata", text:"Write SEO title tags (under 60 chars) and meta descriptions (under 155 chars) for these pages: Home, Projects, About, and this specific case study: [project name/summary]."}
+  ],
+  best:["Write outcomes with numbers where you honestly have them (users, performance gains, timelines)","Keep case studies skimmable: bold key phrases, short paragraphs","Use AI to edit your draft, not replace your voice entirely"],
+  mistakes:["Publishing AI-generated copy verbatim — it reads generic and recruiters notice","Forgetting OG images, so links look broken when shared on LinkedIn/X","Leaving default 'Create Next App' metadata in production"],
+  outputs:["Final copy for all pages","Complete metadata + sitemap + OG images","Search Console verified"],
+  tips:"Read every page out loud once — anything that sounds stiff, rewrite in your own words."
+},
+{
+  id:"testing", title:"Testing & QA", time:"1.5–2 hrs",
+  objectives:["Verify functionality, accessibility, and performance across devices","Catch broken links, layout shifts, and console errors before launch"],
+  tasks:["Run Lighthouse audits on key pages, fix flagged issues","Manually test on mobile, tablet, and desktop breakpoints","Test contact form end-to-end including failure states","Check keyboard navigation and screen-reader landmarks","Run a broken-link check across the whole site"],
+  tools:[
+    {name:"Lighthouse / PageSpeed Insights", why:"The standard for catching performance, accessibility, and SEO issues before launch, directly tied to Core Web Vitals.", alt:"WebPageTest", best:true, price:"Free"},
+    {name:"axe DevTools", why:"Deeper accessibility scanning than Lighthouse alone — catches contrast, ARIA, and landmark issues.", alt:"WAVE", best:false, price:"Free"},
+    {name:"Claude / ChatGPT", why:"Useful for triaging a long list of console errors or Lighthouse warnings into a prioritized fix list.", alt:"—", best:false, price:"Free–$20/mo"}
+  ],
+  prompts:[
+    {label:"Triage audit results", text:"Here's my Lighthouse report output: [paste]. Group these into must-fix vs nice-to-have for a portfolio site launch, and explain the fix for each must-fix item."},
+    {label:"Cross-browser checklist", text:"Give me a manual QA checklist for a Next.js portfolio site covering: responsive breakpoints, form validation states, keyboard navigation, and dark-mode contrast — formatted as a checklist I can tick through."}
+  ],
+  best:["Fix accessibility and performance issues before launch, not after — much cheaper now","Test the contact form's failure paths, not just the happy path","Check the site with images/fonts on a throttled connection"],
+  mistakes:["Only testing on your own laptop and browser","Ignoring console warnings because 'it still works'","Skipping keyboard-only navigation testing"],
+  outputs:["Lighthouse scores 90+ across categories","QA checklist fully passed","Zero console errors on production build"],
+  tips:"Run the audit on the deployed preview URL, not localhost — results differ meaningfully."
+},
+{
+  id:"deploy", title:"Deployment & Launch", time:"1–1.5 hrs",
+  objectives:["Ship to production on a custom domain with monitoring in place","Set up analytics to track real visitor behavior"],
+  tasks:["Connect repo to Vercel, configure environment variables","Point custom domain and verify SSL","Set up analytics (Plausible/Vercel Analytics/GA4)","Submit sitemap to Google Search Console","Announce the launch (LinkedIn, relevant communities)"],
+  tools:[
+    {name:"Vercel", why:"Zero-config deploys for Next.js with preview URLs per PR — the natural pairing for this stack.", alt:"Netlify", best:true, price:"Free tier generous"},
+    {name:"Plausible Analytics", why:"Privacy-friendly, lightweight analytics without a cookie banner, appropriate for a portfolio's traffic scale.", alt:"Vercel Analytics / GA4", best:false, price:"$9/mo (or self-host free)"},
+    {name:"Claude", why:"Draft the launch post and a short outreach message to send alongside the link.", alt:"ChatGPT", best:false, price:"Free–$20/mo"}
+  ],
+  prompts:[
+    {label:"Launch post", text:"Write a short, non-cringe LinkedIn post announcing my new developer portfolio at [URL]. I want to highlight [1-2 standout projects] without sounding like a sales pitch. Keep it under 120 words."},
+    {label:"Deploy checklist", text:"Give me a pre-launch checklist for deploying a Next.js site to Vercel with a custom domain: env vars, DNS, redirects, analytics, and search console — in the order I should do them."}
+  ],
+  best:["Set environment variables in Vercel before the first deploy, not after a failed build","Add a redirect from the www/non-www variant you're not using","Verify the domain's SSL certificate before announcing launch"],
+  mistakes:["Leaving debug/console logs and test data in the production build","Forgetting to set the canonical domain, causing duplicate-content SEO issues","Launching without analytics, so you can't learn from real traffic"],
+  outputs:["Live site on custom domain","Analytics collecting data","Search Console verified and sitemap submitted"],
+  tips:"Do a final full click-through on the live production URL, not just the preview, right after DNS propagates."
+},
+{
+  id:"growth", title:"Post-Launch & Iteration", time:"Ongoing, ~1 hr/mo",
+  objectives:["Keep the portfolio current with minimal ongoing effort","Use real traffic and feedback data to improve conversion (replies, interviews, leads)"],
+  tasks:["Review analytics monthly for drop-off points","Add a new project as soon as it's meaningful, not in a big batch later","Ask 2–3 trusted peers for a fresh-eyes review quarterly","Refresh case-study outcomes with new results when available"],
+  tools:[
+    {name:"Claude / ChatGPT", why:"Useful for quarterly copy refreshes and turning analytics observations into a prioritized to-do list.", alt:"—", best:true, price:"Free–$20/mo"},
+    {name:"Microsoft Clarity", why:"Free session recordings and heatmaps reveal exactly where visitors lose interest.", alt:"Hotjar / PostHog", best:false, price:"Free"},
+    {name:"GitHub Actions", why:"Automates recurring checks (Lighthouse CI, broken-link checks) without manual effort.", alt:"—", best:false, price:"Free for public repos"}
+  ],
+  prompts:[
+    {label:"Analytics review", text:"Here's a summary of my portfolio's analytics for the last month: [paste key numbers — top pages, bounce rate, traffic sources]. What 3 changes would most likely improve engagement or contact form conversions?"},
+    {label:"Content refresh", text:"It's been 3 months since I wrote this case study: [paste]. Help me identify what's stale or could be strengthened with updated outcomes or clearer framing."}
+  ],
+  best:["Update content in small increments continuously, not in big rewrites","Let real analytics — not assumptions — drive what you improve next","Keep a lightweight backlog of 'someday' ideas so scope stays controlled"],
+  mistakes:["Letting the site go stale for a year after the initial launch push","Chasing every analytics blip instead of looking at monthly trends","Redesigning from scratch instead of iterating on what's working"],
+  outputs:["Monthly analytics review notes","Steady cadence of small content updates","A running backlog of future improvements"],
+  tips:"Set a recurring 30-minute monthly calendar block just for portfolio upkeep — it's the difference between a live site and an abandoned one."
+}
+];
+
+const STACK = [
+  ["Planning & copy","Claude","IA, positioning, case-study writing, editing","Free–$20/mo"],
+  ["UI generation","v0 by Vercel","First-draft React/Tailwind components from prompts","Free–$20/mo"],
+  ["In-editor coding","GitHub Copilot","Autocomplete, boilerplate, repetitive patterns","$10/mo"],
+  ["AI-native editor","Cursor","Multi-file refactors, chat-driven code edits","Free–$20/mo"],
+  ["Database","Supabase","Postgres + auth + AI SQL editor","Free tier generous"],
+  ["Hosting","Vercel","Deploys, previews, analytics, custom domain","Free tier generous"],
+  ["Performance QA","Lighthouse","Core Web Vitals, accessibility, SEO audit","Free"],
+  ["Behavior analytics","Microsoft Clarity","Session recordings & heatmaps post-launch","Free"]
+];
+
+const root = document.getElementById('stagesRoot');
+const navList = document.getElementById('navList');
+const state = JSON.parse(localStorage.getItem('awa_state')||'{}');
+state.tasks = state.tasks || {};
+state.notes = state.notes || '';
+state.bookmarks = state.bookmarks || [];
+
+function saveState(){ localStorage.setItem('awa_state', JSON.stringify(state)); updateProgress(); }
+function iconCheck(){return '<svg viewBox="0 0 24 24" fill="none" stroke-width="3"><path d="M4 12l5 5L20 6"/></svg>';}
+
+STAGES.forEach((s,i)=>{
+  const nav = document.createElement('div');
+  nav.className = 'nav-item';
+  nav.id = 'nav-'+s.id;
+  nav.onclick = ()=>scrollToId('stage-'+s.id);
+  nav.innerHTML = '<span class="nav-num">'+String(i+1).padStart(2,'0')+'</span><span>'+s.title+'</span><span class="nav-check" id="navcheck-'+s.id+'"></span>';
+  navList.appendChild(nav);
+
+  const sec = document.createElement('section');
+  sec.className = 'panel fade-in';
+  sec.id = 'stage-'+s.id;
+
+  const toolsHTML = s.tools.map(t=>
+    '<div class="tool-card '+(t.best?'best':'')+'">'+
+      (t.best?'<div class="best-badge">Top pick</div>':'')+
+      '<h4>'+t.name+'</h4>'+
+      '<div class="why">'+t.why+'</div>'+
+      '<div class="meta-row"><span>Alt: '+t.alt+'</span><b>'+t.price+'</b></div>'+
+    '</div>').join('');
+
+  const promptsHTML = s.prompts.map((p,pi)=>
+    '<div class="prompt-item">'+
+      '<div class="pl-label">'+p.label+'</div>'+
+      '<code id="prompt-'+s.id+'-'+pi+'">'+p.text+'</code>'+
+      '<button class="copy-btn" onclick="copyPrompt(\''+'prompt-'+s.id+'-'+pi+'\', this)">Copy</button>'+
+    '</div>').join('');
+
+  const tasksHTML = s.tasks.map((t,ti)=>{
+    const key = s.id+'-'+ti;
+    const checked = state.tasks[key];
+    return '<div class="task-row '+(checked?'done':'')+'" id="row-'+key+'">'+
+      '<div class="task-check '+(checked?'checked':'')+'" onclick="toggleTask(\''+key+'\')">'+(checked?iconCheck():'')+'</div>'+
+      '<div class="task-text" onclick="toggleTask(\''+key+'\')">'+t+'</div>'+
+    '</div>';
+  }).join('');
+
+  sec.innerHTML =
+    '<h3 class="panel-title">'+String(i+1).padStart(2,'0')+' &middot; '+s.title+' <span class="tag">'+s.time+'</span></h3>'+
+    '<p class="panel-sub">Objectives for this stage</p>'+
+    '<div class="grid-3" style="margin-bottom:20px;">'+
+      s.objectives.map(o=>'<div class="mini-card"><h4><span class="dot"></span>Objective</h4><p>'+o+'</p></div>').join('')+
+    '</div>'+
+    '<h4 style="font-size:13px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Tasks</h4>'+
+    '<div style="margin-bottom:22px;">'+tasksHTML+'</div>'+
+    '<h4 style="font-size:13px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Best AI Tools For This Stage</h4>'+
+    '<div class="grid-3" style="margin-bottom:22px;">'+toolsHTML+'</div>'+
+    '<h4 style="font-size:13px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Prompt Library</h4>'+
+    '<div style="margin-bottom:22px;">'+promptsHTML+'</div>'+
+    '<div class="two-col-lists" style="margin-bottom:22px;">'+
+      '<div class="list-block good"><h4>Best Practices</h4><ul>'+s.best.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>'+
+      '<div class="list-block bad"><h4>Common Mistakes</h4><ul>'+s.mistakes.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>'+
+    '</div>'+
+    '<div class="grid-2">'+
+      '<div class="mini-card"><h4><span class="dot"></span>Expected Outputs</h4><ul>'+s.outputs.map(x=>'<li>'+x+'</li>').join('')+'</ul></div>'+
+      '<div class="mini-card"><h4><span class="dot"></span>Efficiency Tip</h4><p>'+s.tips+'</p></div>'+
+    '</div>'+
+    '<div class="stage-nav">'+
+      (i>0?'<button onclick="scrollToId(\'stage-'+STAGES[i-1].id+'\')"><div class="dir">&larr; Previous</div><div class="lbl">'+STAGES[i-1].title+'</div></button>':'<div></div>')+
+      (i<STAGES.length-1?'<button class="next" onclick="scrollToId(\'stage-'+STAGES[i+1].id+'\')"><div class="dir">Next &rarr;</div><div class="lbl">'+STAGES[i+1].title+'</div></button>':'<div></div>')+
+    '</div>';
+  root.appendChild(sec);
+});
+
+function toggleTask(key){
+  state.tasks[key] = !state.tasks[key];
+  saveState();
+  const row = document.getElementById('row-'+key);
+  const box = row.querySelector('.task-check');
+  row.classList.toggle('done', state.tasks[key]);
+  box.classList.toggle('checked', state.tasks[key]);
+  box.innerHTML = state.tasks[key] ? iconCheck() : '';
+  refreshNavChecks();
+}
+
+function refreshNavChecks(){
+  STAGES.forEach(s=>{
+    const total = s.tasks.length;
+    let done = 0;
+    for(let ti=0;ti<total;ti++){ if(state.tasks[s.id+'-'+ti]) done++; }
+    const el = document.getElementById('navcheck-'+s.id);
+    if(done===total && total>0){ el.classList.add('done'); el.innerHTML = iconCheck(); }
+    else { el.classList.remove('done'); el.innerHTML=''; }
+  });
+}
+
+function updateProgress(){
+  let total=0, done=0;
+  STAGES.forEach(s=>{ s.tasks.forEach((t,ti)=>{ total++; if(state.tasks[s.id+'-'+ti]) done++; }); });
+  const pct = total? Math.round(done/total*100):0;
+  document.getElementById('pwFill').style.width = pct+'%';
+  document.getElementById('pwPct').textContent = pct+'%';
+  refreshNavChecks();
+}
+updateProgress();
+
+function scrollToId(id){
+  const el = document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function copyPrompt(id, btn){
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.textContent = 'Copied'; btn.classList.add('copied');
+    showToast('Prompt copied to clipboard');
+    setTimeout(()=>{ btn.textContent='Copy'; btn.classList.remove('copied'); }, 1600);
+  });
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* FLOW DIAGRAM */
+(function(){
+  const svg = document.getElementById('flowSvg');
+  const nodeW=155, nodeH=64, gap=27, startX=15, y=78;
+  let html='';
+  STAGES.forEach((s,i)=>{
+    const x = startX + i*(nodeW+gap);
+    const words = s.title.split(' ');
+    let line1, line2='';
+    if(s.title.length>16){
+      const mid = Math.ceil(words.length/2);
+      line1 = words.slice(0,mid).join(' ');
+      line2 = words.slice(mid).join(' ');
+    } else { line1 = s.title; }
+    html += '<g class="flow-node" style="cursor:pointer" onclick="scrollToId(\'stage-'+s.id+'\')">'+
+      '<rect x="'+x+'" y="'+y+'" width="'+nodeW+'" height="'+nodeH+'" rx="10"></rect>'+
+      '<text x="'+(x+14)+'" y="'+(y+22)+'" font-size="10" class="lbl-num">STAGE '+String(i+1).padStart(2,'0')+'</text>'+
+      '<text x="'+(x+14)+'" y="'+(y+40)+'" font-size="12.5">'+line1+'</text>'+
+      (line2?'<text x="'+(x+14)+'" y="'+(y+55)+'" font-size="12.5">'+line2+'</text>':'')+
+    '</g>';
+    if(i < STAGES.length-1){
+      const x2 = x+nodeW;
+      html += '<path class="flow-edge" d="M'+x2+' '+(y+nodeH/2)+' L'+(x2+gap)+' '+(y+nodeH/2)+'"></path>';
+    }
+  });
+  svg.setAttribute('viewBox', '0 0 '+(startX*2 + STAGES.length*(nodeW+gap))+' 220');
+  svg.innerHTML = html;
+})();
+
+/* DECISION TREE */
+const DT = {
+  start: { q: "How often will you add or edit projects after launch?",
+    options: [ {label:"Rarely — a few times a year", next:"mdx"}, {label:"Often — monthly or more", next:"cms"} ] },
+  mdx: { q: "Good — do you already know React/Next.js basics?",
+    options:[ {label:"Yes, comfortable with React", next:"result_mdx_go"}, {label:"No, still learning", next:"result_mdx_learn"} ] },
+  cms: { q: "Do you need non-technical collaborators to edit content too?",
+    options:[ {label:"Yes, others will edit", next:"result_cms_team"}, {label:"No, just me", next:"result_cms_solo"} ] }
+};
+const DT_RESULTS = {
+  result_mdx_go: "Use MDX files in the repo with Next.js. No database, no CMS — just typed frontmatter per project. Fastest path to launch for a solo developer comfortable with React.",
+  result_mdx_learn: "Still use MDX-in-repo, but budget extra time for stage 3 (Frontend Build). Consider starting from a well-documented Next.js portfolio starter to shorten the learning curve.",
+  result_cms_team: "Use a headless CMS like Sanity or Contentful so collaborators can edit without touching code. Slightly more setup time in stage 4, but worth it for team editing.",
+  result_cms_solo: "Even with frequent updates, MDX-in-repo is often still fine solo — but if editing via GitHub feels like friction, a lightweight headless CMS (Sanity free tier) removes that friction."
+};
+let dtPath = [];
+function renderDT(nodeKey){
+  const step = document.getElementById('dtStep');
+  const bc = document.getElementById('dtBreadcrumb');
+  bc.textContent = dtPath.length ? dtPath.join(' \u2192 ') : '';
+  if(DT_RESULTS[nodeKey]){
+    step.innerHTML = '<div class="q">Recommendation</div><div class="result show">'+DT_RESULTS[nodeKey]+'</div>'+
+    '<div style="margin-top:14px;"><button class="opt" onclick="dtPath=[];renderDT(\'start\')">Start over</button></div>';
+    return;
+  }
+  const node = DT[nodeKey];
+  step.innerHTML = '<div class="q">'+node.q+'</div><div class="options">'+node.options.map(o=>
+    '<button class="opt" onclick="dtPath.push(\''+o.label.replace(/'/g,"\\'")+'\');renderDT(\''+o.next+'\')">'+o.label+'</button>').join('')+'</div>';
+}
+renderDT('start');
+
+/* STACK TABLE */
+document.getElementById('stackBody').innerHTML = STACK.map(r=>
+  '<tr><td class="dim">'+r[0]+'</td><td><b>'+r[1]+'</b></td><td class="dim">'+r[2]+'</td><td>'+r[3]+'</td></tr>'
+).join('');
+
+/* NOTES & BOOKMARKS */
+const notesBox = document.getElementById('notesBox');
+notesBox.value = state.notes;
+notesBox.addEventListener('input', ()=>{ state.notes = notesBox.value; saveState(); });
+
+function renderBookmarks(){
+  const list = document.getElementById('bmList');
+  list.innerHTML = state.bookmarks.map((b,i)=>'<li><span>'+b+'</span><span class="rm" onclick="removeBookmark('+i+')">remove</span></li>').join('') || '<li style="color:var(--muted-2);border:none;">No bookmarks yet.</li>';
+}
+function addBookmark(){
+  const input = document.getElementById('bmInput');
+  if(!input.value.trim()) return;
+  state.bookmarks.push(input.value.trim());
+  input.value='';
+  saveState(); renderBookmarks();
+  showToast('Bookmark saved');
+}
+function removeBookmark(i){
+  state.bookmarks.splice(i,1);
+  saveState(); renderBookmarks();
+}
+renderBookmarks();
+
+document.getElementById('printBtn').onclick = ()=>window.print();
+document.getElementById('resetBtn').onclick = ()=>{
+  if(confirm('Reset all progress, notes, and bookmarks?')){
+    localStorage.removeItem('awa_state');
+    location.reload();
+  }
+};
+
+const stageEls = STAGES.map(s=>document.getElementById('stage-'+s.id));
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+      const id = 'nav-' + e.target.id.replace('stage-','');
+      const el = document.getElementById(id);
+      if(el) el.classList.add('active');
+    }
+  });
+}, {rootMargin:'-20% 0px -70% 0px'});
+stageEls.forEach(el=>el&&io.observe(el));
+</script>
+</body>
+</html>
