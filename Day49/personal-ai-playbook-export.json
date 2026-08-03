@@ -1,0 +1,183 @@
+{
+  "prompts": [
+    {
+      "id": "id_msdgk6ag_l382rp",
+      "title": "Python OOP Learning Assistant",
+      "category": "Learning",
+      "template": "Explain [topic] to me as a [skill level] learner.\n\nStart with a simple explanation.\n\nThen provide:\n• Real-world analogy\n• Step-by-step explanation\n• Syntax (if applicable)\n• Practical example\n• Common mistakes\n• Best practices\n• Interview questions\n• Practice exercise\n\nPresent everything in [format].",
+      "tags": [
+        "python",
+        "oop",
+        "learning",
+        "beginner",
+        "prompt",
+        "ai"
+      ],
+      "favorite": false,
+      "uses": 0,
+      "vars": {
+        "topic": "Object-Oriented Programming",
+        "skill level": "Beginner",
+        "format": "Step-by-step guide"
+      },
+      "created": 1785775390936
+    },
+    {
+      "id": "id_msdgcdrw_vysqua",
+      "title": "Explain a concept simply",
+      "category": "Learning",
+      "template": "Explain [topic] to me like I'm at a [skill level] level. Use a [format] format and include one real-world example.",
+      "tags": [
+        "explanation",
+        "beginner",
+        "structured"
+      ],
+      "favorite": true,
+      "uses": 4,
+      "vars": {
+        "topic": "neural networks",
+        "skill level": "complete beginner",
+        "format": "step-by-step"
+      },
+      "created": 1785256627388
+    },
+    {
+      "id": "id_msdgcdrw_v3a2vv",
+      "title": "Turn notes into a study plan",
+      "category": "Learning",
+      "template": "Here are my raw notes on [topic]:\n\n[notes]\n\nTurn this into a structured [duration] study plan with daily goals.",
+      "tags": [
+        "study plan",
+        "notes",
+        "structure"
+      ],
+      "favorite": false,
+      "uses": 2,
+      "vars": {
+        "topic": "",
+        "notes": "",
+        "duration": "7-day"
+      },
+      "created": 1785429427388
+    },
+    {
+      "id": "id_msdgcdrw_jt5mi2",
+      "title": "Debug this code",
+      "category": "Coding",
+      "template": "I'm getting this error in [language]:\n\n[error]\n\nHere's the relevant code:\n\n[code]\n\nExplain what's wrong and how to fix it.",
+      "tags": [
+        "debugging",
+        "code review"
+      ],
+      "favorite": true,
+      "uses": 9,
+      "vars": {
+        "language": "JavaScript",
+        "error": "",
+        "code": ""
+      },
+      "created": 1785602227388
+    },
+    {
+      "id": "id_msdgcdrw_ncwr6s",
+      "title": "Compare two options",
+      "category": "Research",
+      "template": "Compare [option a] and [option b] for [use case]. Give me a short pros/cons list and a recommendation.",
+      "tags": [
+        "comparison",
+        "decision"
+      ],
+      "favorite": false,
+      "uses": 1,
+      "vars": {
+        "option a": "",
+        "option b": "",
+        "use case": ""
+      },
+      "created": 1785688627388
+    }
+  ],
+  "loops": [
+    {
+      "id": "id_msdgokkq_0o7ivn",
+      "name": "Daily AI & Programming Learning Routine",
+      "type": "recurring",
+      "freq": "Every evening at 7 PM before starting my study session",
+      "steps": [
+        "Choose one AI, Python, SQL, or Machine Learning topic to study.",
+        "Ask Claude to explain the topic with simple examples and create a practice exercise.",
+        "Solve the exercise and review mistakes using AI feedback.",
+        "Solve the exercise and review mistakes using AI feedback.",
+        "Create one GitHub note or LinkedIn learning point."
+      ],
+      "created": 1785775596074
+    },
+    {
+      "id": "id_msdgcdrw_ejclfn",
+      "name": "Daily skill-building routine",
+      "type": "recurring",
+      "freq": "Every morning, 20 min",
+      "steps": [
+        "Pick one topic from backlog",
+        "Ask AI for a beginner explanation",
+        "Ask 3 follow-up questions",
+        "Write a 2-line summary in your own words"
+      ],
+      "created": 1785343027388
+    },
+    {
+      "id": "id_msdgcdrw_sf8wiu",
+      "name": "New topic deep-dive workflow",
+      "type": "workflow",
+      "freq": "When starting a new topic",
+      "steps": [
+        "Get a high-level overview prompt",
+        "Identify 3 key subtopics",
+        "Generate practice questions",
+        "Build a mini project",
+        "Log what you learned"
+      ],
+      "created": 1785515827388
+    }
+  ],
+  "logs": [
+    {
+      "id": "id_msdgq75c_y4gx8h",
+      "title": "Created Prompt Builder and Loop Builder",
+      "tool": "Claude",
+      "outcome": "success",
+      "notes": "Designed reusable AI prompt templates and autonomous workflow loops using HTML, CSS, and JavaScript. Improved prompt engineering skills and built a workflow library for future AI projects.",
+      "created": 1785775671984
+    },
+    {
+      "id": "id_msdgfgwo_we7l72",
+      "title": "Built Personal AI Playbook Dashboard",
+      "tool": "Claude",
+      "outcome": "success",
+      "notes": "Built a Personal AI Playbook using HTML, CSS, and JavaScript. Created reusable prompt templates, a workflow library, a Prompt Builder, and a Loop Builder. Learned how to organize AI workflows into a structured dashboard and improved my prompt engineering skills.",
+      "created": 1785775171416
+    },
+    {
+      "id": "id_msdgcdrw_bwtdbg",
+      "title": "Learned React hooks basics",
+      "tool": "Claude",
+      "outcome": "success",
+      "notes": "useState and useEffect finally clicked using the kitchen-timer analogy.",
+      "created": 1785703027388
+    },
+    {
+      "id": "id_msdgcdrw_lb267p",
+      "title": "Debugged async/await race condition",
+      "tool": "ChatGPT",
+      "outcome": "followup",
+      "notes": "Fixed it but still fuzzy on Promise.all ordering — revisit tomorrow.",
+      "created": 1785595027388
+    }
+  ],
+  "onboarding": {
+    "prompt": true,
+    "loop": true,
+    "log": true,
+    "dismissed": false
+  }
+}
